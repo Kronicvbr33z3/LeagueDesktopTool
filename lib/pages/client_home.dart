@@ -6,6 +6,7 @@ import 'package:kronic_desktop_tool/services/league_client_connector.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:kronic_desktop_tool/services/web_socket_helper.dart';
+import 'package:kronic_desktop_tool/services/champ_select_helper.dart';
 
 class ClientHome extends StatefulWidget {
   static const routeName = '/client_home';
@@ -30,13 +31,14 @@ class _ClientHomeState extends State<ClientHome> {
                 // Home Screen
                 case 0:
                   {
-                    children = <Widget>[Text("Home Screen")];
+                    //children = <Widget>[Text("Home Screen")];
+                    children = <Widget>[ChampionSelectHelper().champSelect()];
                   }
                   break;
                 // Champion Select Screen
                 case 1:
                   {
-                    children = <Widget>[Text("Champ Select")];
+                    children = <Widget>[ChampionSelectHelper().champSelect()];
                   }
                   break;
                 default:
@@ -49,10 +51,11 @@ class _ClientHomeState extends State<ClientHome> {
             }
           }
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: children,
+
           );
         });
   }
