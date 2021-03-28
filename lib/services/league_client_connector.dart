@@ -16,7 +16,37 @@ class LeagueConnector {
 
 
 
-Future<void> constructLCUConnector(File file) async {
+Future<void> constructLCUConnector() async {
+
+  RegExp portexp = RegExp("--app-port=([0-9]*)");
+  RegExp passexp = RegExp('--remoting-auth-token=([\\w-_]*)');
+  if(Platform.isWindows) {
+   await Process.run("wmic", ['PROCESS', 'WHERE', "name='LeagueClientUx.exe'", 'GET', 'commandline'] ).then((ProcessResult results) {
+     if(portexp.hasMatch(results.stdout))
+       {
+         
+         port = portexp.firstMatch(results.stdout.toString()).group(1);
+         password = passexp.firstMatch(results.stdout.toString()).group(1);
+       }
+
+    });
+  } else {
+    await Process.run("ps", ['x', '-o', 'args' ,'|' ,'grep', "\'LeagueClientUx\'"]).then((ProcessResult results) {
+      if (portexp.hasMatch(results.stdout)){
+
+        final port = portexp.firstMatch(results.stdout.toString()).group(1);
+        final pass = passexp.firstMatch(results.stdout.toString()).group(1);
+      }
+    });
+  }
+
+  url = "https://$username:$password@$address:$port";
+  print("Finished Connector With Regex");
+
+}
+
+  /*
+}
   await file.readAsString().then((String contents) {
     var parts = contents.split(":");
     print(parts);
@@ -28,27 +58,7 @@ Future<void> constructLCUConnector(File file) async {
   });
   url = "https://$username:$password@$address:$port";
   print("finished league connector");
+  await getInstallDirectory();
+
+   */
 }
-
-
-
-
-
-
-
-
-  /* LATER CUZ FUCK THIS
-  Future<String> getInstallDirectory() async {
-    var shell = Shell(runInShell: true);
-
-    if(Platform.isWindows) {
-      command = "WMIC PROCESS WHERE NAME=\'LeagueClientUx.exe\' GET ExecutablePath";
-    } else {
-      command = 'ps x -o args | grep \'LeagueClientUx\'';
-    }
-    await shell.run('''WMIC PROCESS WHERE NAME=LeagueClientUx.exe GET ExecutablePath''');
-
-  }
-      */
-}
-

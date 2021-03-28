@@ -6,20 +6,45 @@ import 'package:kronic_desktop_tool/pages/client_home.dart';
 import 'package:kronic_desktop_tool/services/client_manager.dart';
 import 'package:kronic_desktop_tool/services/league_client_connector.dart';
 
-
-
 class Home extends StatefulWidget {
   @override
   _State createState() => _State();
 }
 
 class _State extends State<Home> {
-
-  Future<LeagueConnector> constructLeagueConnector(File file) async {
+  Future<LeagueConnector> constructLeagueConnector() async {
     LeagueConnector instance = LeagueConnector();
-    await instance.constructLCUConnector(file);
+    await instance.constructLCUConnector();
     return instance;
   }
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Client Not Running'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Please make sure the League Client is Running.'),
+                //Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Okay'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
@@ -34,40 +59,35 @@ class _State extends State<Home> {
               elevation: 0.0,
             ),
             body: Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/league_home.jpg'),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(.2),
-                            BlendMode.dstATop)
-                    )
-                ), child: Center(
-                  child: RaisedButton(
-                    padding: EdgeInsets.all(20),
-                    onPressed: () {
-                          final file = picker.OpenFilePicker();
-                          file.forcePreviewPaneOn = true;
-                          file.filterSpecification = {'All Files (*.*)': '*'};
-                          file.title = 'Navigate to League install Directory and Select lockfile (MAKE SURE CLIENT IS RUNNING)';
-                          final result = file.getFile();
-                          if(result != null) {
-                            constructLeagueConnector(result).then((value) {
-                              ClientManager clientManager = ClientManager(value);
-                              if (value.port != null){
-                                Navigator.pushNamed(context, ClientHome.routeName,
-                                    arguments: clientManager);
-                            }
-                            });
-                      }
-                    },
-              child: Text('Choose League Directory', style: TextStyle(fontSize: 20.0)),
-              color: Color.fromRGBO(28, 22, 46, 1),
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/league_home.jpg'),
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(.2), BlendMode.dstATop))),
+              child: Center(
+                child: ElevatedButton(
+                  child: Text('Start', style: TextStyle(fontSize: 20.0)),
+                  style: ButtonStyle (
+                    backgroundColor: MaterialStateProperty.all<Color>(Color.fromRGBO(28, 22, 46, 1)),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(25))
+                  ) ,
 
-              ),
+                  onPressed: () async {
+
+                    constructLeagueConnector().then((value) {
+                      ClientManager clientManager = ClientManager(value);
+                      if (value.port != null) {
+                        Navigator.pushNamed(context, ClientHome.routeName,
+                            arguments: clientManager);
+                      } else
+                        {
+                          _showMyDialog();
+                        }
+                    });
+                  },
                 ),
-            )
-        )
-    );
+              ),
+            )));
   }
 }
