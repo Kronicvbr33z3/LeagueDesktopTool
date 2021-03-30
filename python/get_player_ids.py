@@ -36,7 +36,7 @@ play_ids = []
 count = 0
 while count < 2:
     if count == 0:
-        me = watcher.summoner.by_name(my_region, 'Yassuo')
+        me = watcher.summoner.by_name(my_region, 'Doublelift')
     else:
         try:
             me = watcher.summoner.by_account(my_region, play_ids[count]['accountId'])
