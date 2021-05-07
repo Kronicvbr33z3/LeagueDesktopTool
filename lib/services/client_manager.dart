@@ -30,6 +30,13 @@ class ClientManager {
         body: body);
     print(req.statusCode);
   }
+  Future<String> getRequest(String endpoint) async {
+    var url = "${connector.url}$endpoint";
+    var response = await http.get(url);
+
+    return response.body;
+
+  }
 
   Future<void> deleteRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";

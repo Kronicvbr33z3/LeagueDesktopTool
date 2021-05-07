@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:kronic_desktop_tool/models/session.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/services/client_manager.dart';
@@ -31,14 +32,17 @@ class _ClientHomeState extends State<ClientHome> {
                 // Home Screen
                 case 0:
                   {
-                    //children = <Widget>[Text("Home Screen")];
-                    children = <Widget>[ChampionSelectHelper().champSelect()];
+                    children = <Widget>[Text("Home Screen")];
+
                   }
                   break;
                 // Champion Select Screen
                 case 1:
                   {
-                    children = <Widget>[ChampionSelectHelper().champSelect()];
+
+                    Session session = Session.fromJson(json.decode(snapshot.data)[2]['data']);
+
+                    children = <Widget>[ChampionSelectHelper().champSelect(clientManager, session)];
                   }
                   break;
                 default:
