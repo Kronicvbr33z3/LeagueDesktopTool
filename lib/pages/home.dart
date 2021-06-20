@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:filepicker_windows/filepicker_windows.dart' as picker;
 import 'package:kronic_desktop_tool/pages/client_home.dart';
 import 'package:kronic_desktop_tool/services/client_manager.dart';
 import 'package:kronic_desktop_tool/services/league_client_connector.dart';

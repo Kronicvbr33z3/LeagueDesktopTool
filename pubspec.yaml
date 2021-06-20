@@ -24,8 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  filepicker_windows: ^1.0.0
-  process_run: ^0.11.2+5
+  # process_run: ^0.11.2+5
   http: ^0.12.2
   web_socket_channel: ^1.1.0
   desktop_window: ^0.3.0
