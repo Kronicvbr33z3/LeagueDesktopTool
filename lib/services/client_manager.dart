@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:kronic_desktop_tool/services/league_client_connector.dart';
@@ -10,7 +11,7 @@ class ClientManager {
   Future<void> postRequest(String endpoint, body) async {
     var url = "${connector.url}$endpoint";
     print(url);
-    var req = await http.post(url,
+    var req = await http.post(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
@@ -22,7 +23,7 @@ class ClientManager {
   Future<void> putRequest(String endpoint, body) async {
     var url = "${connector.url}$endpoint";
     print(url);
-    var req = await http.put(url,
+    var req = await http.put(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
@@ -32,7 +33,7 @@ class ClientManager {
   }
   Future<String> getRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";
-    var response = await http.get(url);
+    var response = await http.get(Uri.parse(url));
 
     return response.body;
 
@@ -41,7 +42,7 @@ class ClientManager {
   Future<void> deleteRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";
     print(url);
-    var req = await http.delete(url, headers: {"Accept": "application/json"});
+    var req = await http.delete(Uri.parse(url), headers: {"Accept": "application/json"});
     print(req.statusCode);
   }
 
@@ -68,7 +69,7 @@ class ClientManager {
 
   Future<bool> champSelect() async {
     var url = "${connector.url}/lol-champ-select/v1/session";
-    var response = await http.get(url);
+    var response = await http.get(Uri.parse(url));
 
     if (response.body.contains("No active delegate")) {
       return false;
@@ -79,14 +80,14 @@ class ClientManager {
 
   Future<int> _getRuneId() async {
     var url = "${connector.url}/lol-perks/v1/currentpage";
-    var response = await http.get(url);
+    var response = await http.get(Uri.parse(url));
     var file = json.decode(response.body);
     return file['id'];
   }
 
   Future<int> getCurrentChampId() async {
     var url = "${connector.url}/lol-champ-select/v1/current-champion";
-    var response = await http.get(url);
+    var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       var id = int.parse(response.body);
       return id;
@@ -180,6 +181,12 @@ class ClientManager {
 
   String getPort() {
     return connector.port;
+  }
+
+  NetworkImage getPlayerIcon() {
+    
+
+
   }
 }
 

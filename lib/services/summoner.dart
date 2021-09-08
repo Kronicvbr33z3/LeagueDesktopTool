@@ -197,7 +197,7 @@ class Summoner {
   Future<void> getRankedInfo() async {
     try {
       Response response = await get(
-          'https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/$summonerId?api_key=$apiKey');
+          Uri.parse('https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/$summonerId?api_key=$apiKey'));
       rank = new Rank.fromJson(response.body);
     } catch (e) {
       print(e);
@@ -207,7 +207,7 @@ class Summoner {
   Future<void> setupSummoner() async {
     try {
       Response response = await get(
-          'https://na1.api.riotgames.com/lol/summoner/v4/summoners/$summonerId?api_key=$apiKey');
+          Uri.parse('https://na1.api.riotgames.com/lol/summoner/v4/summoners/$summonerId?api_key=$apiKey'));
       Map summoner = json.decode(response.body);
 
       accountId = summoner['accountId'];

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:kronic_desktop_tool/models/session.dart';
+import 'package:kronic_desktop_tool/pages/home_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/services/client_manager.dart';
@@ -32,7 +33,7 @@ class _ClientHomeState extends State<ClientHome> {
                 // Home Screen
                 case 0:
                   {
-                    children = <Widget>[Text("Home Screen")];
+                    children = <Widget>[HomeView().homeView(clientManager)];
 
                   }
                   break;
@@ -56,7 +57,7 @@ class _ClientHomeState extends State<ClientHome> {
           }
 
           return Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: children,
 
@@ -84,35 +85,6 @@ class _ClientHomeState extends State<ClientHome> {
           constraints: BoxConstraints.expand(),
           color: Color.fromRGBO(28, 22, 46, 1),
           child: home(clientManager, channel)),
-      bottomNavigationBar: BottomAppBar(
-          color: Color.fromRGBO(28, 22, 46, 1),
-          child: Row(
-            children: [
-              Container(
-                height: 50,
-              )
-            ],
-          )),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromRGBO(184, 88, 88, 1),
-        child: Icon(Icons.accessible_outlined),
-        onPressed: () async {
-          var champSelect = await clientManager.champSelect();
-          print(clientManager.getAuthHeader());
-          if (champSelect) {
-            var champId = await clientManager.getCurrentChampId();
-            if (champId == -1 || champId == 0) {
-              print("Choose Champion");
-            } else {
-              var runes = await clientManager.getRunes(champId);
-              await clientManager.putRunes(runes);
-            }
-          } else {
-            print("Not In Champ Select");
-          }
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
