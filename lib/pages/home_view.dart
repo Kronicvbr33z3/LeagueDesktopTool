@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dart_lol/client_manager.dart';
-import 'package:dart_lol/dart_lol.dart';
+import 'package:dart_lol/lcu/client_manager.dart';
+import 'package:dart_lol/lol_api/dart_lol.dart';
 
 class HomeView{
 

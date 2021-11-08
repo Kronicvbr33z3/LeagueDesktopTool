@@ -1,3 +1,5 @@
+library dart_lol;
+
 import 'dart:convert';
 
 import 'package:http/http.dart';
@@ -177,12 +179,12 @@ final String apiKey = 'RGAPI-88da60fc-f70c-446c-9bde-9217be3db585';
 
 class Summoner {
   static final String apiKey = 'RGAPI-88da60fc-f70c-446c-9bde-9217be3db585';
-  String summonerName;
+  String summonerName = "";
   String accountId = 'loading';
   //MatchHistory matches;
-  Rank rank;
-  int summonerId;
-  Summoner( {this.summonerId});
+  late Rank rank;
+  late int summonerId;
+  Summoner( {required this.summonerId});
 
 
   Summoner.fromJson(Map<String, dynamic> json ) {
@@ -227,11 +229,11 @@ class Summoner {
 
 // INFO FROM RANKS (ADD ANYTHING FOR RANKS HERE)
 class Ranks {
-  String queueType;
-  int wins;
-  String rank;
-  String tier;
-  int lp;
+  late String queueType;
+  late int wins;
+  late String rank;
+  late String tier;
+  late int lp;
 
   Ranks.fromJson(Map<String, dynamic> jsonMap) {
     this.queueType = jsonMap['queueType'];
@@ -244,7 +246,7 @@ class Ranks {
 
 //TOP LEVEL RANK
 class Rank {
-  List<Ranks> ranks;
+  late List<Ranks> ranks;
   Rank.fromJson(String jsonStr) {
     final _map = jsonDecode(jsonStr);
 

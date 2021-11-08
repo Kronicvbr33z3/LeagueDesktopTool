@@ -8,14 +8,14 @@ class LeagueConnector {
   String address = "127.0.0.1";
   String port = "null";
   String username = "riot";
-  late String password;
+  String password = "";
   late String url;
   late var lockFile;
 
   LeagueConnector( );
 
 
-  Future<void> constructLCUConnector() async {
+  Future<bool> constructLCUConnector() async {
     RegExp portexp = RegExp("--app-port=([0-9]*)");
     RegExp passexp = RegExp('--remoting-auth-token=([\\w-_]*)');
     if (Platform.isWindows) {
@@ -29,6 +29,11 @@ class LeagueConnector {
         if (portexp.hasMatch(results.stdout)) {
           port = portexp.firstMatch(results.stdout.toString())!.group(1)!;
           password = passexp.firstMatch(results.stdout.toString())!.group(1)!;
+          url = "https://$username:$password@$address:$port";
+          print("Finished Connector With Regex");
+          return true;
+        } else {
+          return false;
         }
       });
     } else {
@@ -38,10 +43,16 @@ class LeagueConnector {
         if (portexp.hasMatch(results.stdout)) {
           final port = portexp.firstMatch(results.stdout.toString())!.group(1);
           final pass = passexp.firstMatch(results.stdout.toString())!.group(1);
+          url = "https://$username:$password@$address:$port";
+          print("Finished Connector With Regex");
+          return true;
+        } else {
+          return false;
         }
       });
+      return false;
     }
-
+    return false;
     url = "https://$username:$password@$address:$port";
     print("Finished Connector With Regex");
   }

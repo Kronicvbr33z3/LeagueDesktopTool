@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
-import 'package:dart_lol/league_client_connector.dart';
+import 'package:dart_lol/lcu/league_client_connector.dart';
 
 class ClientManager {
   LeagueConnector connector;
