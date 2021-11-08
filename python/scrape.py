@@ -1,7 +1,7 @@
 from riotwatcher import LolWatcher, ApiError
 import pandas as pd
 
-watcher = LolWatcher('RGAPI-88da60fc-f70c-446c-9bde-9217be3db585')
+watcher = LolWatcher('RGAPI-7c9cfb49-1ffd-478e-848d-6d64d02ba6c2')
 
 my_region = 'na1'
 
@@ -47,14 +47,17 @@ def get_match_data():
     match_ids = []
     for player in players_to_analyze:
         try:
-            match_list = watcher.match.matchlist_by_account(my_region, player, end_index=5)['matches']
+            print("retrieving match list")
+            match_list = watcher.match.matchlist_by_puuid('americas', player, count=5, type="ranked")
             for match in match_list:
-                match_detail = watcher.match.by_id(my_region, match['gameId'])
-                if match_detail['gameMode'] == "CLASSIC":
-                    match_ids.append(match['gameId'])
+                match_detail = watcher.match.by_id('americas', match)
+                print(match_detail['info']['gameMode'])
+                if match_detail['info']['gameMode'] == "CLASSIC":
+                    match_ids.append(match)
                     matches.append(match_detail)
-        except Exception:
-            print("User Not Found")
+                    print(match_ids)
+        except Exception as e:
+            print(e)
 
     #Remove Duplicates in data collection        
     remove_dup(match_ids)
@@ -72,32 +75,32 @@ def get_match_data():
 
     matches_analyzed = 0
     for match in matches:
-        for row in match['participants']:
+        for row in match['info']['participants']:
             participants_row = {}
             participants_row['champion'] = row['championId']
-            participants_row['spell1'] = row['spell1Id']
-            participants_row['spell2'] = row['spell2Id']
-            participants_row['win'] = row['stats']['win']
-            participants_row['kills'] = row['stats']['kills']
-            participants_row['deaths'] = row['stats']['deaths']
-            participants_row['assists'] = row['stats']['assists']
-            participants_row['totalDamageDealt'] = row['stats']['totalDamageDealt']
-            participants_row['item0'] = row['stats']['item0']
-            participants_row['item1'] = row['stats']['item1']
-            participants_row['item2'] = row['stats']['item2']
-            participants_row['item3'] = row['stats']['item3']
-            participants_row['item4'] = row['stats']['item4']
-            participants_row['item5'] = row['stats']['item5']
-            participants_row['item6'] = row['stats']['item6']
-            participants_row['perk0'] = row['stats']['perk0']
-            participants_row['perk1'] = row['stats']['perk1']
-            participants_row['perk2'] = row['stats']['perk2']
-            participants_row['perk3'] = row['stats']['perk3']
-            participants_row['perk4'] = row['stats']['perk4']
-            participants_row['perk5'] = row['stats']['perk5']
-            participants_row['statPerk0'] = row['stats']['statPerk0']
-            participants_row['statPerk1'] = row['stats']['statPerk1']
-            participants_row['statPerk2'] = row['stats']['statPerk2'] 
+            participants_row['spell1'] = row['summoner1Id']
+            participants_row['spell2'] = row['summoner2Id']
+            participants_row['win'] = row['win']
+            participants_row['kills'] = row['kills']
+            participants_row['deaths'] = row['deaths']
+            participants_row['assists'] = row['assists']
+            participants_row['totalDamageDealt'] = row['totalDamageDealt']
+            participants_row['item0'] = row['item0']
+            participants_row['item1'] = row['item1']
+            participants_row['item2'] = row['item2']
+            participants_row['item3'] = row['item3']
+            participants_row['item4'] = row['item4']
+            participants_row['item5'] = row['item5']
+            participants_row['item6'] = row['item6']
+            participants_row['perk0'] = row['perks']['styles'][0]['selections'][0]['perk']
+            participants_row['perk1'] = row['perks']['styles'][0]['selections'][1]['perk']
+            participants_row['perk2'] = row['perks']['styles'][0]['selections'][2]['perk']
+            participants_row['perk3'] = row['perks']['styles'][0]['selections'][3]['perk']
+            participants_row['perk4'] = row['perks']['styles'][1]['selections'][0]['perk']
+            participants_row['perk5'] = row['perks']['styles'][1]['selections'][1]['perk']
+            participants_row['statPerk0'] = row['perks']['statPerks']['offense'] 
+            participants_row['statPerk1'] = row['perks']['statPerks']['flex']
+            participants_row['statPerk2'] = row['perks']['statPerks']['defense']
 
 
             participants.append(participants_row)
@@ -118,3 +121,4 @@ def get_match_data():
     df.to_csv("matches.csv")
 
     print("Matches analyzed: " + str(matches_analyzed))
+get_match_data()

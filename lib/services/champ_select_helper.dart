@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'client_manager.dart';
+import 'package:dart_lol/client_manager.dart';
 import 'package:kronic_desktop_tool/models/session.dart';
 
 

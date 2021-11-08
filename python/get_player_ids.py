@@ -2,9 +2,10 @@ from riotwatcher import LolWatcher, ApiError
 import pandas as pd
 from riotwatcher.Handlers.RateLimit.BasicRateLimiter import BasicRateLimiter
 
-watcher = LolWatcher('RGAPI-88da60fc-f70c-446c-9bde-9217be3db585', rate_limiter = BasicRateLimiter())
+watcher = LolWatcher('RGAPI-fe7d0926-6090-4287-a701-7b27bdefc194', rate_limiter = BasicRateLimiter())
 
 my_region = 'na1'
+match_region = 'americas'
 
 #me = watcher.summoner.by_name(my_region, 'Doublelift')
 
@@ -35,29 +36,25 @@ def get_ids():
 
     play_ids = []
     count = 0
-    while count < 2:
+    while count < 30:
         if count == 0:
-            me = watcher.summoner.by_name(my_region, 'Doublelift')
+            me = watcher.summoner.by_name(my_region, 'GeneralSn1per')
         else:
             try:
-                me = watcher.summoner.by_account(my_region, play_ids[count]['accountId'])
+                me = watcher.summoner.by_account(my_region, play_ids[count])
             except Exception:
                 count += 1
                 pass
-        my_matches = watcher.match.matchlist_by_account(my_region, me['accountId'])['matches']
+        my_matches = watcher.match.matchlist_by_puuid(match_region, me['puuid'], type="ranked")
     #last_match = my_matches['matches'][0]
     # match_detail = watcher.match.by_id(my_region, last_match['gameId'])
 
         for match in my_matches:
             print("Match")
-            match_detail = watcher.match.by_id(my_region, match['gameId'])
-            participants = []
-            for row in match_detail['participantIdentities']:
-                participants_row = {}
-                participants_row['accountId'] = row['player']["accountId"]
-                participants.append(participants_row)
-            for partcipant in participants:
-                play_ids.append(partcipant)
+            match_detail = watcher.match.by_id(match_region, match)
+            
+            for row in match_detail['metadata']['participants']:
+                play_ids.append(row);
 
         count += 1
             
@@ -68,12 +65,13 @@ def get_ids():
 
     a = open("player_ids.txt", "a")
     for play_id in play_ids:
-        if play_id['accountId'] in already_anaylzed:
+        if play_id in already_anaylzed:
             pass
         else:
-            a.write(play_id['accountId'] + '\n')
+            a.write(play_id + '\n')
 
     a.close()
     print(df)
 
  
+get_ids()

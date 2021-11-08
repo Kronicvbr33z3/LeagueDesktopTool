@@ -1,8 +1,10 @@
+library dart_lol;
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
-import 'package:kronic_desktop_tool/services/league_client_connector.dart';
+import 'package:dart_lol/league_client_connector.dart';
 
 class ClientManager {
   LeagueConnector connector;
@@ -95,7 +97,7 @@ class ClientManager {
     return -1;
   }
 
-  Future<RuneData> getRunes(int champId, [int id]) async {
+  Future<RuneData> getRunes(int champId, [int? id]) async {
     var file = await rootBundle.loadString('python/champions/$champId.json');
     var values = jsonDecode(file);
 
@@ -143,34 +145,6 @@ class ClientManager {
           ],
           "subStyleId": rd.subStyleId
         }));
-
-    // var test = jsonEncode({
-    //   "autoModifiedSelections": [0],
-    //   "current": true,
-    //   "id": 0,
-    //   "isActive": true,
-    //   "isDeletable": true,
-    //   "isEditable": true,
-    //   "isValid": true,
-    //   "lastModified": 0,
-    //   "name": "Kronic Desktop Tool",
-    //   "order": 0,
-    //   "primaryStyleId": rd.primaryStyleId,
-    //   "selectedPerkIds": [
-    //     rd.perk0,
-    //     rd.perk1,
-    //     rd.perk2,
-    //     rd.perk3,
-    //     rd.perk4,
-    //     rd.perk5,
-    //     rd.statPerk0,
-    //     rd.statPerk1,
-    //     rd.statPerk2
-    //   ],
-    //   "subStyleId": rd.subStyleId
-    // });
-
-    // print(test);
   }
 
   String getAuthHeader() {
@@ -183,11 +157,7 @@ class ClientManager {
     return connector.port;
   }
 
-  NetworkImage getPlayerIcon() {
-    
 
-
-  }
 }
 
 class RuneData {
