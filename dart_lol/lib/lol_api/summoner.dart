@@ -175,31 +175,34 @@ Map queues = {
   900: "URF",
 };
 
-final String apiKey = 'RGAPI-88da60fc-f70c-446c-9bde-9217be3db585';
+final String apiKey = 'RGAPI-63923bae-a39f-42fc-a64e-72007d8ea098';
 
 class Summoner {
-  static final String apiKey = 'RGAPI-88da60fc-f70c-446c-9bde-9217be3db585';
+  static final String apiKey = 'RGAPI-63923bae-a39f-42fc-a64e-72007d8ea098';
   String summonerName = "";
-  String accountId = 'loading';
+  int accountId = 0;
+  int profileIconId = 0;
+  String puuid = "";
+  int summonerLevel = 0;
   //MatchHistory matches;
   late Rank rank;
-  late int summonerId;
-  Summoner( {required this.summonerId});
+  late String summonerId;
+  Summoner(this.accountId, this.summonerName, this.profileIconId, this.puuid,
+      this.summonerLevel);
 
-
-  Summoner.fromJson(Map<String, dynamic> json ) {
+  Summoner.fromJson(Map<String, dynamic> json) {
     summonerName = json['displayName'];
   }
 
   Future<void> getAccountId() async {
     // make the request
-
   }
 
   Future<void> getRankedInfo() async {
     try {
-      Response response = await get(
-          Uri.parse('https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/$summonerId?api_key=$apiKey'));
+      Response response = await get(Uri.parse(
+          'https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/$summonerId?api_key=$apiKey'));
+
       rank = new Rank.fromJson(response.body);
     } catch (e) {
       print(e);
@@ -208,24 +211,18 @@ class Summoner {
 
   Future<void> setupSummoner() async {
     try {
-      Response response = await get(
-          Uri.parse('https://na1.api.riotgames.com/lol/summoner/v4/summoners/$summonerId?api_key=$apiKey'));
+      Response response = await get(Uri.parse(
+          'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/$summonerName?api_key=$apiKey'));
       Map summoner = json.decode(response.body);
 
-      accountId = summoner['accountId'];
       summonerId = summoner['id'];
-      summonerName = summoner['name'];
     } catch (e) {
       print('Unable to Load Summoner');
-      accountId = 'Unable to Find Summoner';
+      accountId = 0;
     }
     await getRankedInfo();
-
   }
-
-
 }
-
 
 // INFO FROM RANKS (ADD ANYTHING FOR RANKS HERE)
 class Ranks {

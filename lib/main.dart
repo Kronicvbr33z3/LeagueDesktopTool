@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/pages/client_home.dart';
 import 'package:kronic_desktop_tool/pages/home.dart';
 import 'package:desktop_window/desktop_window.dart';
+import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -30,8 +32,11 @@ class _MyAppState extends State<MyApp> {
     await DesktopWindow.setMinWindowSize(Size(1280,720));
     await DesktopWindow.setMaxWindowSize(Size(1280,720));
   }
+
+
   @override
   void initState() {
+    LeagueClientProvider _leagueClientConnector = new LeagueClientProvider();
     super.initState();
   }
   Future _getWindowSize() async {
@@ -45,23 +50,29 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     init_window();
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Montserrat',
-        brightness: Brightness.dark,
-        primaryColor: Color.fromRGBO(28, 22, 46, 1),
-        accentColor: Color.fromRGBO(40, 34, 57, 1),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LeagueClientProvider()),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          fontFamily: 'Montserrat',
+          brightness: Brightness.dark,
+          primaryColor: Color.fromRGBO(28, 22, 46, 1),
+          accentColor: Color.fromRGBO(40, 34, 57, 1),
+        ),
+        initialRoute: '/home',
+        routes: {
+          // '/': (context) => Loading(),
+          '/home': (context) => Home(),
+          ClientHome.routeName: (context) => ClientHome(),
+          //   ViewSummoner.routeName: (context) => ViewSummoner(),
+          //  ViewTFTSummoner.routeName: (context) => ViewTFTSummoner(),
+          // ViewAnalyzedMatch.routeName: (context) => ViewAnalyzedMatch(),
+          // '/tier_list': (context) => TierList(),
+        },
       ),
-      initialRoute: '/home',
-      routes: {
-        // '/': (context) => Loading(),
-        '/home': (context) => Home(),
-        ClientHome.routeName: (context) => ClientHome(),
-        //   ViewSummoner.routeName: (context) => ViewSummoner(),
-        //  ViewTFTSummoner.routeName: (context) => ViewTFTSummoner(),
-        // ViewAnalyzedMatch.routeName: (context) => ViewAnalyzedMatch(),
-        // '/tier_list': (context) => TierList(),
-      },
     );
   }
 }
+
