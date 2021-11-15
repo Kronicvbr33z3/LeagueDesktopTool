@@ -1,6 +1,7 @@
 library dart_lol;
 
 import 'dart:convert';
+import 'package:dart_lol/lol_api/summoner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
@@ -33,18 +34,19 @@ class ClientManager {
         body: body);
     print(req.statusCode);
   }
+
   Future<String> getRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";
     var response = await http.get(Uri.parse(url));
 
     return response.body;
-
   }
 
   Future<void> deleteRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";
     print(url);
-    var req = await http.delete(Uri.parse(url), headers: {"Accept": "application/json"});
+    var req = await http
+        .delete(Uri.parse(url), headers: {"Accept": "application/json"});
     print(req.statusCode);
   }
 
@@ -95,6 +97,15 @@ class ClientManager {
       return id;
     }
     return -1;
+  }
+
+  Future<Summoner> getSummoner() async {
+    var url = "${connector.url}/lol-summoner/v1/current-summoner";
+    var response = await http.get(Uri.parse(url));
+    var file = json.decode(response.body);
+    print(response.body);
+    return Summoner(file['accountId'], file['displayName'],
+        file['profileIconId'], file['puuid'], file['summonerLevel']);
   }
 
   Future<RuneData> getRunes(int champId, [int? id]) async {
@@ -156,8 +167,6 @@ class ClientManager {
   String getPort() {
     return connector.port;
   }
-
-
 }
 
 class RuneData {

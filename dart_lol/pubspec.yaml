@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   http: ^0.13.3
   provider: ^6.0.0
+  watcher: ^1.0.1
 
 dev_dependencies:
   flutter_test:

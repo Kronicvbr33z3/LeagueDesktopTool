@@ -1,4 +1,5 @@
 library dart_lol;
+
 import 'dart:io';
 
 class LeagueConnector {
@@ -12,8 +13,9 @@ class LeagueConnector {
   late String url;
   late var lockFile;
 
-  LeagueConnector( );
+  late bool success;
 
+  LeagueConnector();
 
   Future<bool> constructLCUConnector() async {
     RegExp portexp = RegExp("--app-port=([0-9]*)");
@@ -30,29 +32,29 @@ class LeagueConnector {
           port = portexp.firstMatch(results.stdout.toString())!.group(1)!;
           password = passexp.firstMatch(results.stdout.toString())!.group(1)!;
           url = "https://$username:$password@$address:$port";
+          success = true;
           print("Finished Connector With Regex");
-          return true;
         } else {
-          return false;
+          success = false;
         }
       });
     } else {
       await Process.run(
-          "ps", ['x', '-o', 'args', '|', 'grep', "\'LeagueClientUx\'"]).then((
-          ProcessResult results) {
+              "ps", ['x', '-o', 'args', '|', 'grep', "\'LeagueClientUx\'"])
+          .then((ProcessResult results) {
         if (portexp.hasMatch(results.stdout)) {
           final port = portexp.firstMatch(results.stdout.toString())!.group(1);
           final pass = passexp.firstMatch(results.stdout.toString())!.group(1);
           url = "https://$username:$password@$address:$port";
           print("Finished Connector With Regex");
-          return true;
+          success = true;
         } else {
-          return false;
+          success = false;
         }
       });
-      return false;
+      success = false;
     }
-    return false;
+    return success;
     url = "https://$username:$password@$address:$port";
     print("Finished Connector With Regex");
   }
