@@ -15,15 +15,19 @@ class ChampionSelectHelper {
           Container(
             width: 300,
             height: 280,
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, i) {
-                  return Padding(
-                      padding: EdgeInsets.fromLTRB(6, 0, 6, 8),
-                      child: ListTile(title: Text("${snapshot.data[i]} ")));
-                },
-              ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, i) {
+                      return Padding(
+                          padding: EdgeInsets.fromLTRB(6, 0, 6, 8),
+                          child: ListTile(title: Text("${snapshot.data[i]} ")));
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
