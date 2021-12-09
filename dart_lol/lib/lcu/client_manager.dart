@@ -193,4 +193,19 @@ class RuneData {
       this.statPerk2,
       this.primaryStyleId,
       this.subStyleId);
+
+  static RuneData fromJson(decode) {
+    return RuneData(
+        decode['perk0'],
+        decode['perk1'],
+        decode['perk2'],
+        decode['perk3'],
+        decode['perk4'],
+        decode['perk5'],
+        decode['statPerk0'],
+        decode['statPerk1'],
+        decode['statPerk2'],
+        decode['primaryStyleId'],
+        decode['subStyleId']);
+  }
 }

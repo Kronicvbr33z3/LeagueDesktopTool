@@ -27,9 +27,9 @@ class HomeView {
     return Column(
       children: <Widget>[
         getQueue(data, i),
-        Text(data.rank.ranks[i].tier,
+        Text(data.rank.ranks[i].tier ?? "Unranked",
             style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(data.rank.ranks[i].rank,
+        Text(data.rank.ranks[i].rank ?? "Unranked",
             style: TextStyle(fontWeight: FontWeight.bold)),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -47,43 +47,62 @@ class HomeView {
     var summoner =
         Provider.of<LeagueClientProvider>(context, listen: false).summoner;
 
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Text(
-          summoner.summonerName,
-          style: TextStyle(
-            fontSize: 50,
-            fontWeight: FontWeight.bold,
+    //create list to store ranks
+    List<Ranks> rankList = [];
+    for (var rank in summoner.rank.ranks) {
+      if (rank.tier == null) {
+        rankList.add(rank);
+      }
+      //remove rankList items from summoner.rank.ranks
+
+    }
+    for (var rankToRemove in rankList) {
+      summoner.rank.ranks.remove(rankToRemove);
+    }
+
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(
+            summoner.summonerName,
+            style: TextStyle(
+              fontSize: 50,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Text(
-          "Level: " + summoner.summonerLevel.toString(),
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.normal,
+          Text(
+            "Level: " + summoner.summonerLevel.toString(),
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.normal,
+            ),
           ),
-        ),
-        ListView.separated(
-          separatorBuilder: (context, index) => Divider(
-            color: Colors.black,
-          ),
-          itemCount: summoner.rank.ranks.length,
-          addAutomaticKeepAlives: true,
-          shrinkWrap: true,
-          itemBuilder: (context, i) {
-            return _buildRankInfo(summoner, i);
-          },
-        ),
-        FutureBuilder<NetworkImage>(
-            future: summonerIcon(summoner.profileIconId),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return CircleAvatar(foregroundImage: snapshot.data, radius: 50);
+          ListView.separated(
+            separatorBuilder: (context, index) => Divider(
+              color: Colors.yellow,
+            ),
+            itemCount: summoner.rank.ranks.length,
+            addAutomaticKeepAlives: true,
+            shrinkWrap: true,
+            itemBuilder: (context, i) {
+              if (summoner.rank.ranks[i].tier == null) {
+                return Container();
               }
-              return CircleAvatar();
-            })
-      ],
+              return _buildRankInfo(summoner, i);
+            },
+          ),
+          FutureBuilder<NetworkImage>(
+              future: summonerIcon(summoner.profileIconId),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return CircleAvatar(
+                      foregroundImage: snapshot.data, radius: 50);
+                }
+                return CircleAvatar();
+              })
+        ],
+      ),
     );
   }
 }

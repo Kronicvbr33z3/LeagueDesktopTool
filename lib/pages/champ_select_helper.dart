@@ -1,3 +1,4 @@
+import 'package:dart_lol/kronic_desktop_tool/kronic_desktop_server.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:dart_lol/lcu/client_manager.dart';
@@ -35,7 +36,7 @@ class ChampionSelectHelper {
                   if (champId == -1 || champId == 0) {
                     print("Choose Champion");
                   } else {
-                    var runes = await cl.getRunes(champId);
+                    var runes = await KronicServer.getRunes(champId);
                     await cl.putRunes(runes);
                   }
                 } else {
