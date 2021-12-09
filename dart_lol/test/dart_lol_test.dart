@@ -1,4 +1,4 @@
-import 'package:dart_lol/dart_lol.dart';
+import 'package:dart_lol/lol_api/dart_lol.dart';
 
 void main() {
 

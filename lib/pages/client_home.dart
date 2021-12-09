@@ -3,12 +3,12 @@ import 'package:kronic_desktop_tool/models/session.dart';
 import 'package:kronic_desktop_tool/pages/home_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
-import 'package:dart_lol/client_manager.dart';
-import 'package:dart_lol/league_client_connector.dart';
+import 'package:dart_lol/lcu/client_manager.dart';
+import 'package:dart_lol/lcu/league_client_connector.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:kronic_desktop_tool/services/web_socket_helper.dart';
-import 'package:kronic_desktop_tool/services/champ_select_helper.dart';
+import 'package:dart_lol/lcu/web_socket_helper.dart';
+import 'package:kronic_desktop_tool/pages/champ_select_helper.dart';
 
 class ClientHome extends StatefulWidget {
   static const routeName = '/client_home';
@@ -17,7 +17,8 @@ class ClientHome extends StatefulWidget {
 }
 
 class _ClientHomeState extends State<ClientHome> {
-  Widget home(ClientManager clientManager, WebSocketChannel channel) {
+  Widget home(ClientManager clientManager, WebSocketChannel channel,
+      BuildContext context) {
     return StreamBuilder(
         stream: channel.stream,
         builder: (context, snapshot) {
@@ -33,17 +34,20 @@ class _ClientHomeState extends State<ClientHome> {
                 // Home Screen
                 case 0:
                   {
-                    children = <Widget>[HomeView().homeView(clientManager)];
-
+                    children = <Widget>[
+                      Expanded(child: HomeView().homeView(context))
+                    ];
                   }
                   break;
                 // Champion Select Screen
                 case 1:
                   {
+                    Session session =
+                        Session.fromJson(json.decode(snapshot.data)[2]['data']);
 
-                    Session session = Session.fromJson(json.decode(snapshot.data)[2]['data']);
-
-                    children = <Widget>[ChampionSelectHelper().champSelect(clientManager, session)];
+                    children = <Widget>[
+                      ChampionSelectHelper().champSelect(clientManager, session)
+                    ];
                   }
                   break;
                 default:
@@ -60,7 +64,6 @@ class _ClientHomeState extends State<ClientHome> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: children,
-
           );
         });
   }
@@ -73,18 +76,10 @@ class _ClientHomeState extends State<ClientHome> {
         headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
     channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     return Scaffold(
-      appBar: AppBar(
-        leading: new Container(),
-        title: Text("Home",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Color.fromRGBO(28, 22, 46, 1),
-        elevation: 0.0,
-      ),
       body: Container(
           constraints: BoxConstraints.expand(),
           color: Color.fromRGBO(28, 22, 46, 1),
-          child: home(clientManager, channel)),
+          child: home(clientManager, channel, context)),
     );
   }
 }

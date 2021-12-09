@@ -1,9 +1,10 @@
 import 'dart:io';
-
+import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/pages/client_home.dart';
-import 'package:dart_lol/client_manager.dart';
-import 'package:dart_lol/league_client_connector.dart';
+import 'package:dart_lol/lcu/client_manager.dart';
+import 'package:dart_lol/lcu/league_client_connector.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _State extends State<Home> {
     await instance.constructLCUConnector();
     return instance;
   }
+
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
@@ -67,26 +69,51 @@ class _State extends State<Home> {
               child: Center(
                 child: ElevatedButton(
                   child: Text('Start', style: TextStyle(fontSize: 20.0)),
-                  style: ButtonStyle (
-                    backgroundColor: MaterialStateProperty.all<Color>(Color.fromRGBO(28, 22, 46, 1)),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(25))
-                  ) ,
-
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Color.fromRGBO(28, 22, 46, 1)),
+                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.all(25))),
                   onPressed: () async {
-
-                    constructLeagueConnector().then((value) {
-                      ClientManager clientManager = ClientManager(value);
+                    constructLeagueConnector().then((value) async {
                       if (value.port != "null") {
+                        await Provider.of<LeagueClientProvider>(context,
+                                listen: false)
+                            .makeClientManager(value);
                         Navigator.pushNamed(context, ClientHome.routeName,
-                            arguments: clientManager);
-                      } else
-                        {
-                          _showMyDialog();
-                        }
+                            arguments: Provider.of<LeagueClientProvider>(
+                                    context,
+                                    listen: false)
+                                .clientManager);
+                      } else {
+                        _showMyDialog();
+                      }
                     });
                   },
                 ),
               ),
             )));
   }
+
+/*   @override
+  void didChangeDependencies() {
+    Provider.of<LeagueClientProvider>(context, listen: false)
+        .clientRunning()
+        .listen((state) {
+      switch (state) {
+        case false:
+          Navigator.pushReplacementNamed(context, "/home");
+          break;
+        case true:
+          Provider.of<LeagueClientProvider>(context, listen: false)
+              .makeClientManager();
+          Navigator.pushNamed(context, ClientHome.routeName,
+              arguments:
+                  Provider.of<LeagueClientProvider>(context, listen: false)
+                      .clientManager);
+          break;
+      }
+    });
+    super.didChangeDependencies();
+  } */
 }
