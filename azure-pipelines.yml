@@ -19,6 +19,11 @@ jobs:
         mode: 'auto'
         channel: 'stable'
         version: 'latest'
+
+    - task: FlutterCommand@0
+      inputs:
+          projectDirectory: '.'
+          arguments: 'config --enable-windows-desktop'
     - task: FlutterBuild@0
       inputs:
         target: 'windows'
