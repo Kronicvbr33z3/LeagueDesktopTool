@@ -1,0 +1,40 @@
+# Starter pipeline
+
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+variables:
+  projectDirectory: 'kronic_desktop_tool'
+
+trigger:
+- master
+
+jobs:
+  - job: WindowsBuild
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: FlutterInstall@0
+      inputs:
+        mode: 'auto'
+        channel: 'stable'
+        version: 'latest'
+
+    - task: FlutterCommand@0
+      inputs:
+          projectDirectory: '.'
+          arguments: 'config --enable-windows-desktop'
+    - task: FlutterBuild@0
+      inputs:
+        target: 'windows'
+        projectDirectory: '.'
+      
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '.\build\windows\runner\Release'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+        
