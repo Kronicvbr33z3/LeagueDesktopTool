@@ -184,11 +184,12 @@ class Summoner {
   int profileIconId = 0;
   String puuid = "";
   int summonerLevel = 0;
+  int lcuSummonerApi = 0;
   //MatchHistory matches;
   late Rank rank;
   late String summonerId;
   Summoner(this.accountId, this.summonerName, this.profileIconId, this.puuid,
-      this.summonerLevel);
+      this.summonerLevel, this.lcuSummonerApi);
 
   Summoner.fromJson(Map<String, dynamic> json) {
     summonerName = json['displayName'];

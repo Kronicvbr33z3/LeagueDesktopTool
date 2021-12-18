@@ -104,8 +104,13 @@ class ClientManager {
     var response = await http.get(Uri.parse(url));
     var file = json.decode(response.body);
     print(response.body);
-    return Summoner(file['accountId'], file['displayName'],
-        file['profileIconId'], file['puuid'], file['summonerLevel']);
+    return Summoner(
+        file['accountId'],
+        file['displayName'],
+        file['profileIconId'],
+        file['puuid'],
+        file['summonerLevel'],
+        file['summonerId']);
   }
 
   Future<RuneData> getRunes(int champId, [int? id]) async {
