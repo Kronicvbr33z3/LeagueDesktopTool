@@ -1,6 +1,5 @@
 import 'package:dart_lol/lol_api/summoner.dart';
 import 'package:flutter/material.dart';
-import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:dart_lol/lol_api/dart_lol.dart';
 import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 import 'package:provider/provider.dart';

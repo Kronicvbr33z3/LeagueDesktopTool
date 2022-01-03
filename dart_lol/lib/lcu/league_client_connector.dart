@@ -44,7 +44,7 @@ class LeagueConnector {
           .then((ProcessResult results) {
         if (portexp.hasMatch(results.stdout)) {
           final port = portexp.firstMatch(results.stdout.toString())!.group(1);
-          final pass = passexp.firstMatch(results.stdout.toString())!.group(1);
+          // final pass = passexp.firstMatch(results.stdout.toString())!.group(1);
           url = "https://$username:$password@$address:$port";
           print("Finished Connector With Regex");
           success = true;
@@ -55,7 +55,5 @@ class LeagueConnector {
       success = false;
     }
     return success;
-    url = "https://$username:$password@$address:$port";
-    print("Finished Connector With Regex");
   }
 }

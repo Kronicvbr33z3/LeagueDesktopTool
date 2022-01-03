@@ -7,8 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:kronic_desktop_tool/main.dart';
 import 'package:kronic_desktop_tool/pages/home.dart';
 
 void main() {

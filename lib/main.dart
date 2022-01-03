@@ -20,47 +20,46 @@ void main() {
   HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
+
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  // ignore: unused_field
   String _windowSize = 'Unknown';
 
-  void init_window() async {
-    await DesktopWindow.setMinWindowSize(Size(1280,720));
-    await DesktopWindow.setMaxWindowSize(Size(1280,720));
+  void initWindow() async {
+    await DesktopWindow.setMinWindowSize(Size(1280, 720));
+    await DesktopWindow.setMaxWindowSize(Size(1280, 720));
   }
-
 
   @override
   void initState() {
+    // ignore: unused_local_variable
     LeagueClientProvider _leagueClientConnector = new LeagueClientProvider();
     super.initState();
   }
+
+  // ignore: unused_element
   Future _getWindowSize() async {
     var size = await DesktopWindow.getWindowSize();
     setState(() {
-    _windowSize = '${size.width} x ${size.height}';
+      _windowSize = '${size.width} x ${size.height}';
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    init_window();
+    initWindow();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LeagueClientProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(
-          fontFamily: 'Montserrat',
-          brightness: Brightness.dark,
-          primaryColor: Color.fromRGBO(28, 22, 46, 1),
-          accentColor: Color.fromRGBO(40, 34, 57, 1),
-        ),
+            fontFamily: 'Montserrat', colorScheme: ColorScheme.dark()),
         initialRoute: '/home',
         routes: {
           // '/': (context) => Loading(),
@@ -75,4 +74,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-

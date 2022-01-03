@@ -175,10 +175,10 @@ Map queues = {
   900: "URF",
 };
 
-final String apiKey = 'RGAPI-63923bae-a39f-42fc-a64e-72007d8ea098';
+final String apiKey = 'RGAPI-442337c9-dfd8-48b6-90f1-2fdbbe6411c0';
 
 class Summoner {
-  static final String apiKey = 'RGAPI-63923bae-a39f-42fc-a64e-72007d8ea098';
+  static final String apiKey = 'RGAPI-442337c9-dfd8-48b6-90f1-2fdbbe6411c0';
   String summonerName = "";
   int accountId = 0;
   int profileIconId = 0;

@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/pages/client_home.dart';
-import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:dart_lol/lcu/league_client_connector.dart';
 
 class Home extends StatefulWidget {
@@ -77,7 +75,7 @@ class _State extends State<Home> {
                   onPressed: () async {
                     constructLeagueConnector().then((value) async {
                       if (value.port != "null") {
-                        await Provider.of<LeagueClientProvider>(context,
+                        Provider.of<LeagueClientProvider>(context,
                                 listen: false)
                             .makeClientManager(value);
                         Navigator.pushNamed(context, ClientHome.routeName,

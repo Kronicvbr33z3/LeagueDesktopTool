@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:kronic_desktop_tool/models/session.dart';
-import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 
 class ChampionSelectHelper {
   Widget championSelected(ClientManager cl, dynamic snapshot) {
@@ -62,12 +61,9 @@ class ChampionSelectHelper {
         return false;
       } else {
         return true;
-        var runes = await cl.getRunes(champId);
-        await cl.putRunes(runes);
       }
     } else {
       return false;
-      print("Not In Champ Select");
     }
   }
 

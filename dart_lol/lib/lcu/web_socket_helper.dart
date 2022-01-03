@@ -1,9 +1,5 @@
 library dart_lol;
 
-import 'dart:convert';
-
-import 'package:http/http.dart';
-
 class LCUWebSocketResponse {
   int status = 0;
   LCUWebSocketResponse(String response) {

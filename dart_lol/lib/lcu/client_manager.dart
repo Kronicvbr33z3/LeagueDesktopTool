@@ -2,7 +2,6 @@ library dart_lol;
 
 import 'dart:convert';
 import 'package:dart_lol/lol_api/summoner.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:dart_lol/lcu/league_client_connector.dart';
@@ -133,7 +132,7 @@ class ClientManager {
 
   Future<void> putRunes(RuneData rd) async {
     var runeId = await _getRuneId();
-    await deleteRequest('/lol-perks/v1/pages/${runeId}');
+    await deleteRequest('/lol-perks/v1/pages/$runeId');
     postRequest(
         '/lol-perks/v1/pages',
         jsonEncode({
