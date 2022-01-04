@@ -20,7 +20,7 @@ class LeagueClientProvider with ChangeNotifier {
   ClientManager get clientManager => _clientManager;
   Summoner get summoner => _summoner;
 
-  void makeClientManager(LeagueConnector c) async {
+  Future<void> makeClientManager(LeagueConnector c) async {
     _clientManager = ClientManager(c);
     _summoner = await _clientManager.getSummoner();
     await _summoner.setupSummoner();

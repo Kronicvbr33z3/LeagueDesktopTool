@@ -75,7 +75,7 @@ class _State extends State<Home> {
                   onPressed: () async {
                     constructLeagueConnector().then((value) async {
                       if (value.port != "null") {
-                        Provider.of<LeagueClientProvider>(context,
+                        await Provider.of<LeagueClientProvider>(context,
                                 listen: false)
                             .makeClientManager(value);
                         Navigator.pushNamed(context, ClientHome.routeName,
