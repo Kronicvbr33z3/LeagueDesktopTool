@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:kronic_desktop_tool/models/session.dart';
 import 'package:kronic_desktop_tool/pages/home_view.dart';
+import 'package:kronic_desktop_tool/pages/view_summoner.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_lol/lcu/client_manager.dart';
@@ -74,6 +75,28 @@ class _ClientHomeState extends State<ClientHome> {
         headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
     channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     return Scaffold(
+      drawer: Drawer(),
+      appBar: AppBar(
+        title: Container(
+            width: 250,
+            height: 40,
+            child: Center(
+              child: TextField(
+                onSubmitted: (String value) async {
+                  if (value == '') {
+                    //Field is Empty Don't Submit
+                  } else {
+                    //Initialize Summoner with value from text controller
+                    Navigator.pushNamed(context, ViewSummoner.routeName,
+                        arguments: value);
+                  }
+                },
+                decoration: InputDecoration(
+                    hintText: "Search for Summoner",
+                    prefixIcon: Icon(Icons.search)),
+              ),
+            )),
+      ),
       body: Container(
           constraints: BoxConstraints.expand(),
           color: Color.fromRGBO(28, 22, 46, 1),

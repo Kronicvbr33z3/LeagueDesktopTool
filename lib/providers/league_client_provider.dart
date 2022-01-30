@@ -24,7 +24,6 @@ class LeagueClientProvider with ChangeNotifier {
     _clientManager = ClientManager(c);
     _summoner = await _clientManager.getSummoner();
     await _summoner.setupSummoner();
-    await _summoner.getRankedInfo();
 
     notifyListeners();
   }

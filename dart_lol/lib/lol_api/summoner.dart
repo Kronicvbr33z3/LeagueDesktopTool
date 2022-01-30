@@ -3,182 +3,12 @@ library dart_lol;
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:dart_lol/auth/secrets.dart';
 
-//List of Champs with ID's
-Map champs = {
-  'Qiyana': '246',
-  'Wukong': '62',
-  'Jax': '24',
-  'Fiddlesticks': '9',
-  'Yuumi': '350',
-  'Shaco': '35',
-  'Warwick': '19',
-  'Xayah': '498',
-  'Sylas': '517',
-  'Nidalee': '76',
-  'Zyra': '143',
-  'Kled': '240',
-  'Brand': '63',
-  'Rammus': '33',
-  'Illaoi': '420',
-  'Corki': '42',
-  'Braum': '201',
-  'Sejuani': '113',
-  'Tryndamere': '23',
-  'Miss Fortune': '21',
-  'Yorick': '83',
-  'Xerath': '101',
-  'Sivir': '15',
-  'Riven': '92',
-  'Orianna': '61',
-  'Gangplank': '41',
-  'Sett': '875',
-  'Malphite': '54',
-  'Poppy': '78',
-  'Karthus': '30',
-  'Jayce': '126',
-  'Diana': '131',
-  'Trundle': '48',
-  'Graves': '104',
-  'Zoe': '142',
-  'Gnar': '150',
-  'Lux': '99',
-  'Shyvana': '102',
-  'Renekton': '58',
-  'Lissandra': '127',
-  'Fiora': '114',
-  'Jinx': '222',
-  'Kalista': '429',
-  'Fizz': '105',
-  'Kassadin': '38',
-  'Sona': '37',
-  'Irelia': '39',
-  'Viktor': '112',
-  'Rakan': '497',
-  'Kindred': '203',
-  'Cassiopeia': '69',
-  'Maokai': '57',
-  'Ornn': '516',
-  'Thresh': '412',
-  'Kayle': '10',
-  'Hecarim': '120',
-  'Nunu': '20',
-  'Khazix': '121',
-  'Olaf': '2',
-  'Ziggs': '115',
-  'Syndra': '134',
-  'Dr Mundo': '36',
-  'Karma': '43',
-  'Annie': '1',
-  'Akali': '84',
-  'Leona': '89',
-  'Yasuo': '157',
-  'Kennen': '85',
-  'Rengar': '107',
-  'Ryze': '13',
-  'Shen': '98',
-  'Zac': '154',
-  'Pantheon': '80',
-  'Neeko': '518',
-  'Bard': '432',
-  'Sion': '14',
-  'Vayne': '67',
-  'Nasus': '75',
-  'Kayn': '141',
-  'Twisted Fate': '4',
-  'Chogath': '31',
-  'Udyr': '77',
-  'Lucian': '236',
-  'Ivern': '427',
-  'Volibear': '106',
-  'Caitlyn': '51',
-  'Darius': '122',
-  'Nocturne': '56',
-  'Zilean': '26',
-  'Azir': '268',
-  'Rumble': '68',
-  'Morgana': '25',
-  'Skarner': '72',
-  'Teemo': '17',
-  'Urgot': '6',
-  'Amumu': '32',
-  'Galio': '3',
-  'Heimerdinger': '74',
-  'Anivia': '34',
-  'Ashe': '22',
-  'Velkoz': '161',
-  'Singed': '27',
-  'Taliyah': '163',
-  'Evelynn': '28',
-  'Varus': '110',
-  'Twitch': '29',
-  'Garen': '86',
-  'Blitzcrank': '53',
-  'Master Yi': '11',
-  'Pyke': '555',
-  'Elise': '60',
-  'Alistar': '12',
-  'Katarina': '55',
-  'Ekko': '245',
-  'Mordekaiser': '82',
-  'Lulu': '117',
-  'Camille': '164',
-  'Aatrox': '266',
-  'Draven': '119',
-  'Tahm Kench': '223',
-  'Talon': '91',
-  'Xin Zhao': '5',
-  'Swain': '50',
-  'Aurelion Sol': '136',
-  'Lee Sin': '64',
-  'Aphelios': '523',
-  'Ahri': '103',
-  'Malzahar': '90',
-  'Kaisa': '145',
-  'Tristana': '18',
-  'RekSai': '421',
-  'Vladimir': '8',
-  'Jarvan IV': '59',
-  'Nami': '267',
-  'Jhin': '202',
-  'Soraka': '16',
-  'Veigar': '45',
-  'Janna': '40',
-  'Nautilus': '111',
-  'Senna': '235',
-  'Gragas': '79',
-  'Zed': '238',
-  'Vi': '254',
-  'KogMaw': '96',
-  'Taric': '44',
-  'Quinn': '133',
-  'Leblanc': '7',
-  'Ezreal': '81',
-  'Viego': '234',
-  'Samira': '360',
-  'Lillia': '876',
-  'Seraphine': '147',
-  'Yone': '777',
-  'Rell': '526'
-};
-Map queues = {
-  420: "Solo/Duo",
-  440: "Flex",
-  0: "Custom",
-  76: "URF",
-  400: "Normal",
-  430: "Blind",
-  450: "ARAM",
-  830: "Bots",
-  840: "Bots",
-  850: "Bots",
-  900: "URF",
-};
-
-final String apiKey = 'RGAPI-442337c9-dfd8-48b6-90f1-2fdbbe6411c0';
+final String apiKey = '$riotApiKey';
 
 class Summoner {
-  static final String apiKey = 'RGAPI-442337c9-dfd8-48b6-90f1-2fdbbe6411c0';
+  static final String apiKey = '$riotApiKey';
   String summonerName = "";
   int accountId = 0;
   int profileIconId = 0;
@@ -188,8 +18,10 @@ class Summoner {
   //MatchHistory matches;
   late Rank rank;
   late String summonerId;
+  late List<Match> matches;
   Summoner(this.accountId, this.summonerName, this.profileIconId, this.puuid,
       this.summonerLevel, this.lcuSummonerApi);
+  Summoner.fromName(this.summonerName);
 
   Summoner.fromJson(Map<String, dynamic> json) {
     summonerName = json['displayName'];
@@ -197,6 +29,18 @@ class Summoner {
 
   Future<void> getAccountId() async {
     // make the request
+    try {
+      Response response = await get(Uri.parse(
+          'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/$summonerName?api_key=$apiKey'));
+      Map summoner = jsonDecode(response.body);
+
+      summonerId = summoner['id'];
+      summonerName = summoner['name'];
+      summonerLevel = summoner['summonerLevel'];
+      puuid = summoner['puuid'];
+    } catch (e) {
+      print('Unable to Load Summoner');
+    }
   }
 
   Future<void> getRankedInfo() async {
@@ -222,6 +66,94 @@ class Summoner {
       accountId = 0;
     }
     await getRankedInfo();
+  }
+
+  Future<void> getMatchHistory() async {
+    try {
+      Response response = await get(Uri.parse(
+          'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/$puuid/ids?start=0&count=15&api_key=$apiKey'));
+      var matchHistory = json.decode(response.body);
+      matches = [];
+      for (var match in matchHistory) {
+        matches.add(Match(match));
+      }
+      for (var match in matches) {
+        await match.getMatch(puuid);
+      }
+      //print(matchHistory);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> setupSearchedSummoner() async {
+    await getAccountId();
+    await getRankedInfo();
+    await getMatchHistory();
+  }
+}
+
+class Match {
+  String matchId;
+  late int gameDuration;
+  late int queueId;
+  late int gameId;
+  late String gameMode;
+  late int mapId;
+  List<Participant> participants = [];
+  late Participant me;
+  Match(this.matchId);
+
+  Future<void> getMatch(String puuid) async {
+    try {
+      Response response = await get(Uri.parse(
+          'https://americas.api.riotgames.com/lol/match/v5/matches/$matchId?api_key=$apiKey'));
+      var match = json.decode(response.body);
+      gameDuration = match['info']['gameDuration'];
+      queueId = match['info']['queueId'];
+      gameId = match['info']['gameId'];
+      gameMode = match['info']['gameMode'];
+      mapId = match['info']['mapId'];
+      var listOfParticpants = match['info']['participants'] as List;
+      for (var participant in listOfParticpants) {
+        participants.add(Participant.fromJson(participant));
+      }
+      for (var participant in participants) {
+        if (participant.puuid == puuid) {
+          me = participant;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+}
+
+class Participant {
+  late int championId;
+  late String championName;
+  late String puuid;
+  late String summonerName;
+  late int summonerLevel;
+  late int kills;
+  late int assists;
+  late int deaths;
+  late int summoner1Id;
+  late int summoner2Id;
+  late bool win;
+
+  Participant.fromJson(Map<String, dynamic> jsonMap) {
+    this.championId = jsonMap['championId'];
+    this.championName = jsonMap['championName'];
+    this.puuid = jsonMap['puuid'];
+    this.summonerName = jsonMap['summonerName'];
+    this.summonerLevel = jsonMap['summonerLevel'];
+    this.kills = jsonMap['kills'];
+    this.assists = jsonMap['assists'];
+    this.deaths = jsonMap['deaths'];
+    this.summoner1Id = jsonMap['summoner1Id'];
+    this.summoner2Id = jsonMap['summoner2Id'];
+    this.win = jsonMap['win'];
   }
 }
 

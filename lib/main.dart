@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/pages/client_home.dart';
 import 'package:kronic_desktop_tool/pages/home.dart';
 import 'package:desktop_window/desktop_window.dart';
+import 'package:kronic_desktop_tool/pages/view_summoner.dart';
 import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -65,6 +66,7 @@ class _MyAppState extends State<MyApp> {
           // '/': (context) => Loading(),
           '/home': (context) => Home(),
           ClientHome.routeName: (context) => ClientHome(),
+          ViewSummoner.routeName: (context) => ViewSummoner(),
           //   ViewSummoner.routeName: (context) => ViewSummoner(),
           //  ViewTFTSummoner.routeName: (context) => ViewTFTSummoner(),
           // ViewAnalyzedMatch.routeName: (context) => ViewAnalyzedMatch(),

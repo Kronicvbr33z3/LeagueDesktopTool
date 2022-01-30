@@ -12,7 +12,6 @@ class ClientManager {
 
   Future<void> postRequest(String endpoint, body) async {
     var url = "${connector.url}$endpoint";
-    print(url);
     var req = await http.post(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
@@ -24,7 +23,6 @@ class ClientManager {
 
   Future<void> putRequest(String endpoint, body) async {
     var url = "${connector.url}$endpoint";
-    print(url);
     var req = await http.put(Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +41,6 @@ class ClientManager {
 
   Future<void> deleteRequest(String endpoint) async {
     var url = "${connector.url}$endpoint";
-    print(url);
     var req = await http
         .delete(Uri.parse(url), headers: {"Accept": "application/json"});
     print(req.statusCode);
@@ -102,7 +99,6 @@ class ClientManager {
     var url = "${connector.url}/lol-summoner/v1/current-summoner";
     var response = await http.get(Uri.parse(url));
     var file = json.decode(response.body);
-    print(response.body);
     return Summoner(
         file['accountId'],
         file['displayName'],
