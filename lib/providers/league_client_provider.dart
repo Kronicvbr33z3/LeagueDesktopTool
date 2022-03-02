@@ -1,5 +1,8 @@
 // ignore_for_file: unused_field
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:dart_lol/lol_api/summoner.dart';
 import 'package:watcher/watcher.dart';
@@ -11,42 +14,62 @@ class LeagueClientProvider with ChangeNotifier {
   // this is used to update the app when the league client launches or closes.
 
   //Runs command every 5 seconds to check if league client is running.
-  String _status;
-  FileWatcher _lockfileWatcher;
-  var _clientRunning;
-  ClientManager _clientManager;
-  Summoner _summoner;
+  DirectoryWatcher? _dirWatcher;
+  ClientManager? _clientManager;
+  Summoner? _summoner;
+  String _leagueClientDir = "";
   // Construct and initalize client manager
-  ClientManager get clientManager => _clientManager;
-  Summoner get summoner => _summoner;
+  LeagueConnector? _connector;
+  ClientManager get clientManager => _clientManager!;
+  Summoner get summoner => _summoner!;
 
-  Future<void> makeClientManager(LeagueConnector c) async {
-    _clientManager = ClientManager(c);
-    _summoner = await _clientManager.getSummoner();
-    await _summoner.setupSummoner();
-
+  Future<bool> makeClientManager() async {
+    _clientManager = ClientManager(_connector!);
+    _summoner = await _clientManager?.getSummoner();
+    await _summoner?.setupSummoner();
     notifyListeners();
+    return true;
   }
 
-/*   Stream<bool> clientRunning() {
-    StreamController<bool> _clientRunningController;
-    Timer timer;
-    Duration timerInterval = Duration(seconds: 5);
-    _connector = LeagueConnector();
-    void startCheck() async {
-      timer = Timer.periodic(timerInterval, (timer) async {
-        //Brodcast false if client is not running
-        var status = await _connector.constructLCUConnector();
-        _clientRunningController.add(status);
-        if (status) {
-          timer.cancel();
-        }
-      });
+  Future<void>? initLockFileWatcher(String dir, StreamController<bool> stream) {
+    if (_dirWatcher != null) {
+      return null;
     }
 
-    void running() async {}
+    _dirWatcher = DirectoryWatcher(dir);
+    _dirWatcher?.events.listen((event) async {
+      if (event.path.contains("lockfile") && event.type == ChangeType.ADD) {
+        var file = File(event.path);
+        await _connector?.constructFromLCUFile(file);
+        stream.add(true);
+      } else if (event.path.contains("lockfile") &&
+          event.type == ChangeType.REMOVE) {
+        stream.add(false);
+        return;
+      }
+    });
+    return null;
+  }
+
+  Stream<bool> clientRunning() {
+    StreamController<bool>? _clientRunningController;
+    _connector = LeagueConnector();
+    void startCheck() async {
+      if (_leagueClientDir != "") {
+        await initLockFileWatcher(_leagueClientDir, _clientRunningController!);
+        return;
+      }
+
+      if (await _connector!.constructLCUConnector()) {
+        _leagueClientDir = _connector!.path;
+        await initLockFileWatcher(_leagueClientDir, _clientRunningController!);
+        _clientRunningController.add(true);
+        print("League Client Directory: $_leagueClientDir");
+      } else {}
+    }
+
     _clientRunningController = StreamController<bool>(onListen: startCheck);
 
     return _clientRunningController.stream;
-  } */
+  }
 }

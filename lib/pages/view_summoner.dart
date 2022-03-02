@@ -195,7 +195,7 @@ class _ViewSummonerState extends State<ViewSummoner> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(data.rank.ranks[i].lp.toString() ?? "Not Found",
+            Text(data.rank.ranks[i].lp.toString(),
                 style: TextStyle(fontWeight: FontWeight.bold)),
             Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -250,16 +250,16 @@ class _ViewSummonerState extends State<ViewSummoner> {
 
   @override
   Widget build(BuildContext context) {
-    String data = ModalRoute.of(context).settings.arguments;
+    String? data = ModalRoute.of(context)?.settings.arguments as String?;
 
     return FutureBuilder<Summoner>(
-        future: setupSummoner(data),
+        future: setupSummoner(data!),
         builder: (BuildContext context, AsyncSnapshot<Summoner> snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
               backgroundColor: Color.fromRGBO(28, 22, 46, 1),
               appBar: AppBar(
-                title: Text(snapshot.data.summonerName,
+                title: Text(snapshot.data!.summonerName!,
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 elevation: 0.0,
                 backgroundColor: Color.fromRGBO(28, 22, 46, 1),
@@ -270,12 +270,12 @@ class _ViewSummonerState extends State<ViewSummoner> {
                     color: Color.fromRGBO(43, 38, 60, 1),
                     thickness: 2,
                   ),
-                  _buildRank(snapshot.data),
+                  _buildRank(snapshot.data!),
                   Expanded(
                     child: Container(
                       width: 500,
                       padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                      child: _buildMatchHistory(snapshot.data),
+                      child: _buildMatchHistory(snapshot.data!),
                     ),
                   ),
                   //Divider(color: Color.fromRGBO(43, 38, 60, 1), thickness: 2,),

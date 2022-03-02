@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kronic_desktop_tool/models/session.dart';
 import 'package:kronic_desktop_tool/pages/home_view.dart';
 import 'package:kronic_desktop_tool/pages/view_summoner.dart';
+import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_lol/lcu/client_manager.dart';
@@ -9,6 +12,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:dart_lol/lcu/web_socket_helper.dart';
 import 'package:kronic_desktop_tool/pages/champ_select_helper.dart';
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
 class ClientHome extends StatefulWidget {
   static const routeName = '/client_home';
   @override
@@ -27,7 +31,7 @@ class _ClientHomeState extends State<ClientHome> {
           } else {
             if (snapshot.hasData) {
               LCUWebSocketResponse response =
-                  LCUWebSocketResponse(snapshot.data);
+                  LCUWebSocketResponse(snapshot.data! as String);
 
               switch (response.status) {
                 // Home Screen
@@ -42,7 +46,7 @@ class _ClientHomeState extends State<ClientHome> {
                 case 1:
                   {
                     Session session =
-                        Session.fromJson(json.decode(snapshot.data)[2]['data']);
+                        Session.fromJson(json.decode(snapshot.data! as String)[2]['data']);
 
                     children = <Widget>[
                       ChampionSelectHelper().champSelect(clientManager, session)
@@ -69,11 +73,12 @@ class _ClientHomeState extends State<ClientHome> {
 
   @override
   Widget build(BuildContext context) {
-    ClientManager clientManager = ModalRoute.of(context).settings.arguments;
-    final channel = IOWebSocketChannel.connect(
-        'wss://127.0.0.1:${clientManager.getPort()}',
-        headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
-    channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
+    //ClientManager clientManager =
+    //    Provider.of<LeagueClientProvider>(context, listen: true).clientManager;
+    //final channel = IOWebSocketChannel.connect(
+     //   'wss://127.0.0.1:${clientManager.getPort()}',
+      //  headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
+    //channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     return Scaffold(
       drawer: Drawer(),
       appBar: AppBar(
@@ -96,11 +101,22 @@ class _ClientHomeState extends State<ClientHome> {
                     prefixIcon: Icon(Icons.search)),
               ),
             )),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _auth.signOut();
+              Navigator.pushReplacementNamed(context, '/home');
+            },
+            child: Text("Sign Out"),
+          )
+        ],
+
       ),
       body: Container(
           constraints: BoxConstraints.expand(),
           color: Color.fromRGBO(28, 22, 46, 1),
-          child: home(clientManager, channel, context)),
+          child: Container())
+    //home(clientManager, channel, context)),
     );
   }
 }

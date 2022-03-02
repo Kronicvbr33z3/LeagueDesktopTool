@@ -10,6 +10,7 @@ class LeagueConnector {
   String port = "null";
   String username = "riot";
   String password = "";
+  late String path;
   late String url;
   late var lockFile;
 
@@ -20,8 +21,9 @@ class LeagueConnector {
   Future<bool> constructLCUConnector() async {
     RegExp portexp = RegExp("--app-port=([0-9]*)");
     RegExp passexp = RegExp('--remoting-auth-token=([\\w-_]*)');
+    RegExp installRegex = RegExp("\"--install-directory=(.*?)\"");
     if (Platform.isWindows) {
-      await Process.run("wmic", [
+      var p = await Process.run("wmic", [
         'PROCESS',
         'WHERE',
         "name='LeagueClientUx.exe'",
@@ -31,9 +33,9 @@ class LeagueConnector {
         if (portexp.hasMatch(results.stdout)) {
           port = portexp.firstMatch(results.stdout.toString())!.group(1)!;
           password = passexp.firstMatch(results.stdout.toString())!.group(1)!;
+          path = installRegex.firstMatch(results.stdout.toString())!.group(1)!;
           url = "https://$username:$password@$address:$port";
           success = true;
-          print("Finished Connector With Regex");
         } else {
           success = false;
         }
@@ -55,5 +57,18 @@ class LeagueConnector {
       success = false;
     }
     return success;
+  }
+
+  Future<bool> constructFromLCUFile(File file) async {
+    await file.readAsString().then((String contents) {
+      var parts = contents.split(":");
+      process = parts[0];
+      pid = parts[1];
+      port = parts[2];
+      password = parts[3];
+      protocol = parts[4];
+    });
+    print("Finished Connector With File");
+    return true;
   }
 }

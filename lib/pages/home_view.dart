@@ -25,7 +25,7 @@ class HomeView {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      summoner.summonerName,
+                      summoner.summonerName!,
                       style: TextStyle(
                         fontSize: 50,
                         fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class HomeView {
           right: .0,
           child: Center(
             child: FutureBuilder<NetworkImage>(
-                future: summonerIcon(summoner.profileIconId),
+                future: summonerIcon(summoner.profileIconId!),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return CircleAvatar(
@@ -93,14 +93,14 @@ class HomeView {
     return Column(
       children: <Widget>[
         getQueue(data, i),
-        Text(data.rank.ranks[i].tier ?? "Unranked",
+        Text(data.rank.ranks[i].tier,
             style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(data.rank.ranks[i].rank ?? "Unranked",
+        Text(data.rank.ranks[i].rank,
             style: TextStyle(fontWeight: FontWeight.bold)),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(data.rank.ranks[i].lp.toString() ?? "Not Found",
+            Text(data.rank.ranks[i].lp.toString(),
                 style: TextStyle(fontWeight: FontWeight.bold)),
             Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
           ],

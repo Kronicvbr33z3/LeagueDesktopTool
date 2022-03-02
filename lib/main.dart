@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kronic_desktop_tool/pages/client_home.dart';
 import 'package:kronic_desktop_tool/pages/home.dart';
@@ -8,17 +9,29 @@ import 'package:kronic_desktop_tool/pages/view_summoner.dart';
 import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 import 'package:provider/provider.dart';
 
+
+FirebaseOptions get firebaseOptions => const FirebaseOptions(
+    apiKey: "AIzaSyAG4p80P5M4_86G3tRs_3U_XGFiWzCwjlY",
+    authDomain: "kronic-desktop-tool.firebaseapp.com",
+    projectId: "kronic-desktop-tool",
+    storageBucket: "kronic-desktop-tool.appspot.com",
+    messagingSenderId: "79205642275",
+    appId: "1:79205642275:web:445a624ec1ce2de7454196",
+    measurementId: "G-XVHSLSWY3L"
+);
+
 class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext context) {
+  HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
   }
 }
 
-void main() {
+Future<void> main() async {
   HttpOverrides.global = new MyHttpOverrides();
+  await Firebase.initializeApp(options: firebaseOptions);
   runApp(MyApp());
 }
 

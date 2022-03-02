@@ -72,7 +72,7 @@ class ChampionSelectHelper {
     // var body = json.decode(request);
     // var f = Session.fromJson(body);
     List<String> names = [];
-    for (var teamMember in session.myTeam) {
+    for (var teamMember in session.myTeam!) {
       var response = await cl
           .getRequest("/lol-summoner/v1/summoners/${teamMember.summonerId}");
       //  await Future.delayed(Duration(seconds: 3));
@@ -84,7 +84,7 @@ class ChampionSelectHelper {
   }
 
   Widget champSelect(ClientManager cl, Session session) {
-    return FutureBuilder(
+    return FutureBuilder<List<String>?>(
         future: getSession(cl, session),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -92,7 +92,7 @@ class ChampionSelectHelper {
                 future: champSelected(cl),
                 builder: (context, champSelected) {
                   if (champSelected.hasData) {
-                    if (champSelected.data) {
+                    if (champSelected.data! as bool) {
                       // CHAMP SELECTED
                       return championSelected(cl, snapshot);
                     } else {
@@ -105,12 +105,12 @@ class ChampionSelectHelper {
                           children: [
                             Expanded(
                                 child: ListView.builder(
-                              itemCount: snapshot.data.length,
+                              itemCount: snapshot.data?.length,
                               itemBuilder: (context, i) {
                                 return Padding(
                                     padding: EdgeInsets.fromLTRB(6, 0, 6, 8),
                                     child: ListTile(
-                                        title: Text("${snapshot.data[i]} ")));
+                                        title: Text("${snapshot.data![i]} ")));
                               },
                             )),
                           ],
@@ -127,12 +127,12 @@ class ChampionSelectHelper {
                         children: [
                           Expanded(
                               child: ListView.builder(
-                            itemCount: snapshot.data.length,
+                            itemCount: snapshot.data?.length,
                             itemBuilder: (context, i) {
                               return Padding(
                                   padding: EdgeInsets.fromLTRB(6, 0, 6, 8),
                                   child: ListTile(
-                                      title: Text("${snapshot.data[i]} ")));
+                                      title: Text("${snapshot.data?[i]} ")));
                             },
                           )),
                         ],
