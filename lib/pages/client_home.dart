@@ -13,6 +13,7 @@ import 'package:dart_lol/lcu/web_socket_helper.dart';
 import 'package:kronic_desktop_tool/pages/champ_select_helper.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
+
 class ClientHome extends StatefulWidget {
   static const routeName = '/client_home';
   @override
@@ -20,6 +21,11 @@ class ClientHome extends StatefulWidget {
 }
 
 class _ClientHomeState extends State<ClientHome> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Widget home(ClientManager clientManager, WebSocketChannel channel,
       BuildContext context) {
     return StreamBuilder(
@@ -45,8 +51,8 @@ class _ClientHomeState extends State<ClientHome> {
                 // Champion Select Screen
                 case 1:
                   {
-                    Session session =
-                        Session.fromJson(json.decode(snapshot.data! as String)[2]['data']);
+                    Session session = Session.fromJson(
+                        json.decode(snapshot.data! as String)[2]['data']);
 
                     children = <Widget>[
                       ChampionSelectHelper().champSelect(clientManager, session)
@@ -76,47 +82,73 @@ class _ClientHomeState extends State<ClientHome> {
     //ClientManager clientManager =
     //    Provider.of<LeagueClientProvider>(context, listen: true).clientManager;
     //final channel = IOWebSocketChannel.connect(
-     //   'wss://127.0.0.1:${clientManager.getPort()}',
-      //  headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
+    //   'wss://127.0.0.1:${clientManager.getPort()}',
+    //  headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
     //channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     return Scaffold(
-      drawer: Drawer(),
-      appBar: AppBar(
-        title: Container(
-            width: 250,
-            height: 40,
-            child: Center(
-              child: TextField(
-                onSubmitted: (String value) async {
-                  if (value == '') {
-                    //Field is Empty Don't Submit
+        drawer: Drawer(),
+        appBar: AppBar(
+          title: Container(
+              width: 250,
+              height: 40,
+              child: Center(
+                child: TextField(
+                  onSubmitted: (String value) async {
+                    if (value == '') {
+                      //Field is Empty Don't Submit
+                    } else {
+                      //Initialize Summoner with value from text controller
+                      Navigator.pushNamed(context, ViewSummoner.routeName,
+                          arguments: value);
+                    }
+                  },
+                  decoration: InputDecoration(
+                      hintText: "Search for Summoner",
+                      prefixIcon: Icon(Icons.search)),
+                ),
+              )),
+          actions: [
+            // Add status of league connection here via green/red circle
+            StreamBuilder<bool>(
+                stream: Provider.of<LeagueClientProvider>(context, listen: true)
+                    .clientRunning(),
+                builder: (context, AsyncSnapshot<bool>? snapshot) {
+                  if (snapshot!.hasData) {
+                    if (snapshot.data == true) {
+                      Provider.of<LeagueClientProvider>(context, listen: true)
+                          .makeClientManager();
+                      return IconButton(
+                        icon: Icon(Icons.check_circle),
+                        onPressed: () {},
+                      );
+                    } else {
+                      return IconButton(
+                        icon: Icon(Icons.error),
+                        onPressed: () {},
+                      );
+                    }
                   } else {
-                    //Initialize Summoner with value from text controller
-                    Navigator.pushNamed(context, ViewSummoner.routeName,
-                        arguments: value);
+                    return IconButton(
+                      icon: Icon(Icons.error),
+                      onPressed: () {},
+                    );
                   }
-                },
-                decoration: InputDecoration(
-                    hintText: "Search for Summoner",
-                    prefixIcon: Icon(Icons.search)),
-              ),
-            )),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _auth.signOut();
-              Navigator.pushReplacementNamed(context, '/home');
-            },
-            child: Text("Sign Out"),
-          )
-        ],
+                }),
 
-      ),
-      body: Container(
-          constraints: BoxConstraints.expand(),
-          color: Color.fromRGBO(28, 22, 46, 1),
-          child: Container())
-    //home(clientManager, channel, context)),
-    );
+            TextButton(
+              onPressed: () {
+                _auth.signOut();
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+              child: Text("Sign Out"),
+            )
+          ],
+        ),
+        body: Container(
+            constraints: BoxConstraints.expand(),
+            color: Color.fromRGBO(28, 22, 46, 1),
+            child: Container())
+        //home(clientManager, channel, context)),
+        );
   }
 }

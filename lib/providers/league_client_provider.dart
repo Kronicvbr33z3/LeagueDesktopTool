@@ -8,6 +8,7 @@ import 'package:dart_lol/lol_api/summoner.dart';
 import 'package:watcher/watcher.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_lol/lcu/league_client_connector.dart';
+import 'package:web_socket_channel/io.dart';
 
 class LeagueClientProvider with ChangeNotifier {
   // A provider that watches for changes to the league client.
@@ -18,6 +19,7 @@ class LeagueClientProvider with ChangeNotifier {
   ClientManager? _clientManager;
   Summoner? _summoner;
   String _leagueClientDir = "";
+  IOWebSocketChannel? leagueChannel;
   // Construct and initalize client manager
   LeagueConnector? _connector;
   ClientManager get clientManager => _clientManager!;
@@ -27,6 +29,13 @@ class LeagueClientProvider with ChangeNotifier {
     _clientManager = ClientManager(_connector!);
     _summoner = await _clientManager?.getSummoner();
     await _summoner?.setupSummoner();
+    // initalize websocket
+    leagueChannel = IOWebSocketChannel.connect(
+        'wss://127.0.0.1:${clientManager.getPort()}',
+        headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
+    // Add websocket listener for champ select
+    leagueChannel!.sink
+        .add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     notifyListeners();
     return true;
   }
@@ -35,7 +44,6 @@ class LeagueClientProvider with ChangeNotifier {
     if (_dirWatcher != null) {
       return null;
     }
-
     _dirWatcher = DirectoryWatcher(dir);
     _dirWatcher?.events.listen((event) async {
       if (event.path.contains("lockfile") && event.type == ChangeType.ADD) {
