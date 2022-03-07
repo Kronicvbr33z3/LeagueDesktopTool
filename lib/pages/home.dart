@@ -36,14 +36,15 @@ class ScaffoldSnackbar {
       );
   }
 }
+
 enum AuthMode { login, register, phone }
 
 extension on AuthMode {
   String get label => this == AuthMode.login
       ? 'Sign in'
       : this == AuthMode.phone
-      ? 'Sign in'
-      : 'Register';
+          ? 'Sign in'
+          : 'Register';
 }
 
 class Home extends StatefulWidget {
@@ -64,15 +65,14 @@ class _State extends State<Home> {
   bool isLoading = false;
 
   void setIsLoading() {
-    if(!mounted) return;
-      setState(() {
-        isLoading = !isLoading;
-      });
-
+    if (!mounted) return;
+    setState(() {
+      isLoading = !isLoading;
+    });
   }
 
   void resetError() {
-    if(!mounted) return;
+    if (!mounted) return;
     if (error.isNotEmpty) {
       setState(() {
         error = '';
@@ -143,7 +143,7 @@ class _State extends State<Home> {
         }
       } on FirebaseAuthException catch (e) {
         setIsLoading();
-        if(!mounted) return;
+        if (!mounted) return;
         setState(() {
           error = '${e.message}';
         });
@@ -151,7 +151,6 @@ class _State extends State<Home> {
         setIsLoading();
       }
     }
-
   }
 
   Future<void> _anonymousAuth() async {
@@ -160,7 +159,7 @@ class _State extends State<Home> {
     try {
       await _auth.signInAnonymously();
     } on FirebaseAuthException catch (e) {
-      if(!mounted) return;
+      if (!mounted) return;
       setState(() {
         error = '${e.message}';
       });
@@ -204,174 +203,256 @@ class _State extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
-              leading: new Container(),
-              title: Text("League Of Legends Tool, By Kronic",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              centerTitle: true,
-              backgroundColor: Color.fromRGBO(28, 22, 46, 1),
-              elevation: 0.0,
-            ),
-            body: Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/league_home.jpg'),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(.2), BlendMode.dstATop))),
-                child: Center(
-                        child: Padding(
-                            padding: const EdgeInsets.all(29),
-                            child: Center(
-                                child: SizedBox(
-                                    width: 400,
-                                    child: Form(
-                                        key: formKey,
-                                        autovalidateMode: AutovalidateMode
-                                            .onUserInteraction,
-                                        child: Column(
-                                            children: [
-                                              AnimatedError(text: error,
-                                                  show: error.isNotEmpty),
-                                              const SizedBox(height: 20),
-                                              Column(
-                                                mainAxisAlignment: MainAxisAlignment
-                                                    .center,
+        appBar: AppBar(
+          leading: new Container(),
+          title: Text("League Of Legends Tool, By Kronic",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          backgroundColor: Color.fromRGBO(28, 22, 46, 1),
+          elevation: 0.0,
+        ),
+        body: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/league_home.jpg'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(.2), BlendMode.dstATop))),
+            child: StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                if(snapshot.hasData) {
+                  if(snapshot.data == null)
+                    {
+                      return Center(
+                          child: Padding(
+                              padding: const EdgeInsets.all(29),
+                              child: Center(
+                                  child: SizedBox(
+                                      width: 400,
+                                      child: Form(
+                                          key: formKey,
+                                          autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                          child: Column(children: [
+                                            AnimatedError(
+                                                text: error, show: error.isNotEmpty),
+                                            const SizedBox(height: 20),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                TextFormField(
+                                                  controller: emailController,
+                                                  decoration: const InputDecoration(
+                                                      hintText: 'Email'),
+                                                  validator: (value) =>
+                                                  value != null && value.isNotEmpty
+                                                      ? null
+                                                      : 'Required',
+                                                ),
+                                                const SizedBox(height: 20),
+                                                TextFormField(
+                                                  controller: passwordController,
+                                                  obscureText: true,
+                                                  decoration: const InputDecoration(
+                                                      hintText: 'Password'),
+                                                  validator: (value) =>
+                                                  value != null && value.isNotEmpty
+                                                      ? null
+                                                      : 'Required',
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 10),
+                                            TextButton(
+                                              onPressed: _resetPassword,
+                                              child: Text("Forgot Password?"),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            SizedBox(
+                                              width: double.infinity,
+                                              height: 50,
+                                              child: ElevatedButton(
+                                                  onPressed:
+                                                  isLoading ? null : _emailAuth,
+                                                  child: isLoading
+                                                      ? const CircularProgressIndicator
+                                                      .adaptive()
+                                                      : Text(mode.label)),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            RichText(
+                                                text: TextSpan(
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText1,
+                                                    children: [
+                                                      TextSpan(
+                                                        text: mode == AuthMode.login
+                                                            ? "Don't have an account? "
+                                                            : "You have an account? ",
+                                                      ),
+                                                      TextSpan(
+                                                          text: mode == AuthMode.login
+                                                              ? 'Register now'
+                                                              : 'Click to Login',
+                                                          style: const TextStyle(
+                                                              color: Colors.blue),
+                                                          recognizer: TapGestureRecognizer()
+                                                            ..onTap = () {
+                                                              setState(() {
+                                                                mode = mode == AuthMode.login
+                                                                    ? AuthMode.register
+                                                                    : AuthMode.login;
+                                                              });
+                                                            })
+                                                    ])),
+                                            RichText(
+                                              text: TextSpan(
+                                                style:
+                                                Theme.of(context).textTheme.bodyText1,
                                                 children: [
-                                                  TextFormField(
-                                                    controller: emailController,
-                                                    decoration: const InputDecoration(
-                                                        hintText: 'Email'),
-                                                    validator: (value) =>
-                                                    value != null &&
-                                                        value.isNotEmpty
-                                                        ? null
-                                                        : 'Required',
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  TextFormField(
-                                                    controller: passwordController,
-                                                    obscureText: true,
-                                                    decoration:
-                                                    const InputDecoration(
-                                                        hintText: 'Password'),
-                                                    validator: (value) =>
-                                                    value != null &&
-                                                        value.isNotEmpty
-                                                        ? null
-                                                        : 'Required',
-                                                  ),
+                                                  const TextSpan(text: 'Or '),
+                                                  TextSpan(
+                                                    text: 'continue as guest',
+                                                    style: const TextStyle(
+                                                        color: Colors.blue),
+                                                    recognizer: TapGestureRecognizer()
+                                                      ..onTap = _anonymousAuth,
+                                                  )
                                                 ],
                                               ),
-                                              const SizedBox(height: 10),
-                                              TextButton(
-                                                onPressed: _resetPassword,
-                                                child: Text("Forgot Password?"),
-                                              ),
-                                              const SizedBox(height: 20),
-                                              SizedBox(
-                                                width: double.infinity,
-                                                height: 50,
-                                                child: ElevatedButton(
-                                                    onPressed: isLoading
-                                                        ? null
-                                                        : _emailAuth,
-                                                    child: isLoading
-                                                        ? const CircularProgressIndicator
-                                                        .adaptive()
-                                                        : Text(mode.label)
+                                            ),
+                                          ]))))));
+                    } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                }
+                return Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(29),
+                        child: Center(
+                            child: SizedBox(
+                                width: 400,
+                                child: Form(
+                                    key: formKey,
+                                    autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                    child: Column(children: [
+                                      AnimatedError(
+                                          text: error, show: error.isNotEmpty),
+                                      const SizedBox(height: 20),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          TextFormField(
+                                            controller: emailController,
+                                            decoration: const InputDecoration(
+                                                hintText: 'Email'),
+                                            validator: (value) =>
+                                            value != null && value.isNotEmpty
+                                                ? null
+                                                : 'Required',
+                                          ),
+                                          const SizedBox(height: 20),
+                                          TextFormField(
+                                            controller: passwordController,
+                                            obscureText: true,
+                                            decoration: const InputDecoration(
+                                                hintText: 'Password'),
+                                            validator: (value) =>
+                                            value != null && value.isNotEmpty
+                                                ? null
+                                                : 'Required',
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      TextButton(
+                                        onPressed: _resetPassword,
+                                        child: Text("Forgot Password?"),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 50,
+                                        child: ElevatedButton(
+                                            onPressed:
+                                            isLoading ? null : _emailAuth,
+                                            child: isLoading
+                                                ? const CircularProgressIndicator
+                                                .adaptive()
+                                                : Text(mode.label)),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      RichText(
+                                          text: TextSpan(
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                              children: [
+                                                TextSpan(
+                                                  text: mode == AuthMode.login
+                                                      ? "Don't have an account? "
+                                                      : "You have an account? ",
                                                 ),
-                                              ),
-                                              const SizedBox(height: 20),
-                                              RichText(
-                                                  text: TextSpan(
-                                                      style: Theme
-                                                          .of(context)
-                                                          .textTheme
-                                                          .bodyText1,
-                                                      children: [
-                                                        TextSpan(
-                                                          text: mode ==
-                                                              AuthMode.login
-                                                              ? "Don't have an account? "
-                                                              : "You have an account? ",
-                                                        ),
-                                                        TextSpan(
-                                                            text: mode ==
-                                                                AuthMode.login
-                                                                ? 'Register now'
-                                                                : 'Click to Login',
-                                                            style: const TextStyle(
-                                                                color: Colors
-                                                                    .blue),
-                                                            recognizer: TapGestureRecognizer()
-                                                              ..onTap = () {
-                                                                setState(() {
-                                                                  mode = mode ==
-                                                                      AuthMode
-                                                                          .login
-                                                                      ? AuthMode
-                                                                      .register
-                                                                      : AuthMode
-                                                                      .login;
-                                                                });
-                                                              }
-                                                        )
-                                                      ]
-                                                  )
-                                              ),
-                                              RichText(
-                                                text: TextSpan(
-                                                  style: Theme
-                                                      .of(context)
-                                                      .textTheme
-                                                      .bodyText1,
-                                                  children: [
-                                                    const TextSpan(text: 'Or '),
-                                                    TextSpan(
-                                                      text: 'continue as guest',
-                                                      style: const TextStyle(
-                                                          color: Colors.blue),
-                                                      recognizer: TapGestureRecognizer()
-                                                        ..onTap = _anonymousAuth,
-                                                    )
-                                                  ],
-                                                ),
+                                                TextSpan(
+                                                    text: mode == AuthMode.login
+                                                        ? 'Register now'
+                                                        : 'Click to Login',
+                                                    style: const TextStyle(
+                                                        color: Colors.blue),
+                                                    recognizer: TapGestureRecognizer()
+                                                      ..onTap = () {
+                                                        setState(() {
+                                                          mode = mode == AuthMode.login
+                                                              ? AuthMode.register
+                                                              : AuthMode.login;
+                                                        });
+                                                      })
+                                              ])),
+                                      RichText(
+                                        text: TextSpan(
+                                          style:
+                                          Theme.of(context).textTheme.bodyText1,
+                                          children: [
+                                            const TextSpan(text: 'Or '),
+                                            TextSpan(
+                                              text: 'continue as guest',
+                                              style: const TextStyle(
+                                                  color: Colors.blue),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = _anonymousAuth,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ]))))));
+              },
 
-                                              ),
-                                            ])
-                                    )
-                                )
-                            )
-                        )
-                    ) )
-                  );
-
-
+            )));
 
   }
+
   @override
   void initState() {
-    if(!mounted) return;
-    FirebaseAuth.instance.authStateChanges()
-        .listen((User? user) async {
+    if (!mounted) return;
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+
       if (user == null) {
-      }
-      else {
+      } else {
         //user is signed in
-        if(!mounted) return;
+        if (!mounted) return;
+        Provider.of<LeagueClientProvider>(context, listen: false).preferences = await SharedPreferences.getInstance();
         Navigator.pushReplacementNamed(context, ClientHome.routeName);
       }
     });
     super.initState();
   }
-  @override
-  void dispose()
-  {
 
+  @override
+  void dispose() {
     super.dispose();
   }
-
-
-
 }

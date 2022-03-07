@@ -23,7 +23,7 @@ class LeagueConnector {
     RegExp passexp = RegExp('--remoting-auth-token=([\\w-_]*)');
     RegExp installRegex = RegExp("\"--install-directory=(.*?)\"");
     if (Platform.isWindows) {
-      var p = await Process.run("wmic", [
+      await Process.run("wmic", [
         'PROCESS',
         'WHERE',
         "name='LeagueClientUx.exe'",

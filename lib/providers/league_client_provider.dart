@@ -5,17 +5,30 @@ import 'dart:io';
 
 import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:dart_lol/lol_api/summoner.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watcher/watcher.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_lol/lcu/league_client_connector.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class LeagueClientProvider with ChangeNotifier {
   // A provider that watches for changes to the league client.
   // this is used to update the app when the league client launches or closes.
 
   //Runs command every 5 seconds to check if league client is running.
+  LeagueClientProvider() {
+    clientRunning()
+        .listen((data) async {
+      if (data) {
+        await makeClientManager();
+        await initWebSocket();
+        _clientRunningCheck = true;
+        notifyListeners();
+      }
+    });
+  }
+
+
   DirectoryWatcher? _dirWatcher;
   ClientManager? _clientManager;
   Summoner? _summoner;
@@ -23,13 +36,18 @@ class LeagueClientProvider with ChangeNotifier {
   bool _clientRunningCheck = false;
   IOWebSocketChannel? leagueChannel;
   WebSocket? _ws;
+  SharedPreferences? preferences;
+  Stream? clientStream;
   // Construct and initalize client manager
   LeagueConnector? _connector;
-  ClientManager get clientManager => _clientManager!;
+  ClientManager? get clientManager => _clientManager!;
   Summoner get summoner => _summoner!;
   bool get clientRunningCheck => _clientRunningCheck;
-
   Future<bool> makeClientManager() async {
+    if(_clientManager != null)
+      {
+        return true;
+      }
     _clientManager = ClientManager(_connector!);
     while (!await _clientManager!.checkClientConnection())
       {
@@ -47,27 +65,25 @@ class LeagueClientProvider with ChangeNotifier {
         return;
       }
     leagueChannel =  IOWebSocketChannel.connect(
-        'wss://127.0.0.1:${clientManager.getPort()}',
-        headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
+        'wss://127.0.0.1:${clientManager!.getPort()}',
+        headers: {"Authorization": "Basic ${clientManager!.getAuthHeader()}"});
 
     leagueChannel!.sink
         .add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
+    clientStream = leagueChannel!.stream.asBroadcastStream();
   }
-
   Future<void>? initProcessWatcher(StreamController<bool>? stream) {
     Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (await _connector!.constructLCUConnector()) {
       _leagueClientDir = _connector!.path;
       await initLockFileWatcher(_leagueClientDir, stream!);
       stream.add(true);
-      _clientRunningCheck = true;
       print("League Client Directory: $_leagueClientDir");
       timer.cancel();
       }
     });
     return null;
   }
-
   Future<void>? initLockFileWatcher(String dir, StreamController<bool> stream) {
     if (_dirWatcher != null) {
       return null;
@@ -93,21 +109,19 @@ class LeagueClientProvider with ChangeNotifier {
     });
     return null;
   }
-
   Stream<bool> clientRunning() {
     StreamController<bool>? _clientRunningController;
     _connector = LeagueConnector();
     void startCheck() async {
+      //get preferences
       if (_leagueClientDir != "") {
         await initLockFileWatcher(_leagueClientDir, _clientRunningController!);
         return;
       }
-
       if (await _connector!.constructLCUConnector()) {
         _leagueClientDir = _connector!.path;
         await initLockFileWatcher(_leagueClientDir, _clientRunningController!);
         _clientRunningController.add(true);
-        _clientRunningCheck = true;
         print("League Client Directory: $_leagueClientDir");
       } else {
         initProcessWatcher(_clientRunningController);
