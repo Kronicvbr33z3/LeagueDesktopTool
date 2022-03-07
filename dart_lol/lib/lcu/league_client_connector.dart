@@ -4,7 +4,7 @@ import 'dart:io';
 
 class LeagueConnector {
   late String process;
-  late String pid;
+  String? pid;
   late String protocol;
   String address = "127.0.0.1";
   String port = "null";
@@ -40,6 +40,7 @@ class LeagueConnector {
           success = false;
         }
       });
+
     } else {
       await Process.run(
               "ps", ['x', '-o', 'args', '|', 'grep', "\'LeagueClientUx\'"])
@@ -56,6 +57,7 @@ class LeagueConnector {
       });
       success = false;
     }
+
     return success;
   }
 
@@ -68,6 +70,7 @@ class LeagueConnector {
       password = parts[3];
       protocol = parts[4];
     });
+    url = "https://$username:$password@$address:$port";
     print("Finished Connector With File");
     return true;
   }

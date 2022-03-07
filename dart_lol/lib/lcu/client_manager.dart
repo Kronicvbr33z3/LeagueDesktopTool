@@ -167,6 +167,19 @@ class ClientManager {
   String getPort() {
     return connector.port;
   }
+  Future<bool> checkClientConnection() async{
+    var url = "${connector.url}/lol-summoner/v1/current-summoner";
+    try {
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200){
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+    return false;
+
+  }
 }
 
 class RuneData {

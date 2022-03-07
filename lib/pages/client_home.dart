@@ -12,6 +12,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:dart_lol/lcu/web_socket_helper.dart';
 import 'package:kronic_desktop_tool/pages/champ_select_helper.dart';
 
+var clientRunning = false;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class ClientHome extends StatefulWidget {
@@ -22,10 +23,30 @@ class ClientHome extends StatefulWidget {
 
 class _ClientHomeState extends State<ClientHome> {
   @override
-  void initState() {
-    super.initState();
-  }
+  void didChangeDependencies() {
+    // check if client was running
+    clientRunning = Provider.of<LeagueClientProvider>(context, listen: false).clientRunningCheck;
+    print(clientRunning);
+    Provider.of<LeagueClientProvider>(context, listen: false)
+            .clientRunning().listen((data) async {
+      if (data) {
+        await Provider.of<LeagueClientProvider>(context, listen: false)
+            .makeClientManager();
+        await Provider.of<LeagueClientProvider>(context, listen: false)
+            .initWebSocket();
+      }
+    });
 
+    super.didChangeDependencies();
+  }
+  Widget clientStatus() {
+    clientRunning = Provider.of<LeagueClientProvider>(context, listen: true).clientRunningCheck;
+    if(clientRunning) {
+      return IconButton(icon: Icon(Icons.accessible_outlined, color: Colors.green), tooltip: 'League Client Running',onPressed: () {  } );
+    } else {
+      return IconButton(icon: Icon(Icons.accessible_outlined, color: Colors.red), tooltip: 'League Client Not Running',onPressed: () {  } );
+      }
+  }
   Widget home(ClientManager clientManager, WebSocketChannel channel,
       BuildContext context) {
     return StreamBuilder(
@@ -109,32 +130,7 @@ class _ClientHomeState extends State<ClientHome> {
               )),
           actions: [
             // Add status of league connection here via green/red circle
-            StreamBuilder<bool>(
-                stream: Provider.of<LeagueClientProvider>(context, listen: true)
-                    .clientRunning(),
-                builder: (context, AsyncSnapshot<bool>? snapshot) {
-                  if (snapshot!.hasData) {
-                    if (snapshot.data == true) {
-                      Provider.of<LeagueClientProvider>(context, listen: true)
-                          .makeClientManager();
-                      return IconButton(
-                        icon: Icon(Icons.check_circle),
-                        onPressed: () {},
-                      );
-                    } else {
-                      return IconButton(
-                        icon: Icon(Icons.error),
-                        onPressed: () {},
-                      );
-                    }
-                  } else {
-                    return IconButton(
-                      icon: Icon(Icons.error),
-                      onPressed: () {},
-                    );
-                  }
-                }),
-
+            clientStatus(),
             TextButton(
               onPressed: () {
                 _auth.signOut();
