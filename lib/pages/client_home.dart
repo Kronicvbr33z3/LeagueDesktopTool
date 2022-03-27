@@ -8,10 +8,7 @@ import 'package:kronic_desktop_tool/providers/league_client_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
-import 'package:dart_lol/lcu/client_manager.dart';
 import 'package:dart_lol/lcu/web_socket_helper.dart';
 import 'package:kronic_desktop_tool/pages/champ_select_helper.dart';
 
@@ -25,24 +22,25 @@ class ClientHome extends StatefulWidget {
 }
 
 class _ClientHomeState extends State<ClientHome> {
+  var connectionState = 0;
   final introKey = GlobalKey<IntroductionScreenState>();
   TextEditingController userNameController = TextEditingController();
-  void _onIntroEnd(SharedPreferences prefs, String summonerName) async{
-    if(summonerName == "")
-      {
-        return;
-      }
+  void _onIntroEnd(SharedPreferences prefs, String summonerName) async {
+    if (summonerName == "") {
+      return;
+    }
     await prefs.setString('summonerName', summonerName);
-    setState(() {
-
-    });
+    setState(() {});
   }
+
   @override
   void didChangeDependencies() {
     // check if client was running
     clientRunning = Provider.of<LeagueClientProvider>(context, listen: false)
         .clientRunningCheck;
-    print(clientRunning);
+    if (clientRunning) {
+      connectionState = 1;
+    }
     super.didChangeDependencies();
   }
 
@@ -61,40 +59,49 @@ class _ClientHomeState extends State<ClientHome> {
           onPressed: () {});
     }
   }
-  Widget barCollapsed(){
 
-    return Container(decoration: BoxDecoration(
-        color: Colors.blueGrey,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0))),
+  Widget barCollapsed() {
+    return Container(
+        decoration: BoxDecoration(
+            color: Colors.blueGrey,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24.0),
+                topRight: Radius.circular(24.0))),
         margin: EdgeInsets.fromLTRB(24, 24, 24, 0),
         child: Center(child: Text("Test header")));
   }
 
   Widget home(BuildContext context) {
-    if(clientRunning) {
-      var clientManager = Provider.of<LeagueClientProvider>(context, listen: false).clientManager!;
-      var clientStream = Provider.of<LeagueClientProvider>(context, listen: false).clientStream!;
-
+    if (clientRunning) {
+      var clientManager =
+          Provider.of<LeagueClientProvider>(context, listen: false)
+              .clientManager!;
+      var leagueChannel =
+          Provider.of<LeagueClientProvider>(context, listen: false)
+              .leagueStream!;
       return Container(
         decoration: BoxDecoration(
             color: Color.fromRGBO(28, 22, 46, 1),
-            borderRadius: BorderRadius.all(Radius.circular(24.0))
-
-        ),
+            borderRadius: BorderRadius.all(Radius.circular(24.0))),
         margin: EdgeInsets.all(24),
         child: StreamBuilder(
-            stream: clientStream,
+            stream: leagueChannel,
             builder: (context, snapshot) {
               List<Widget> children;
               if (snapshot.hasError) {
                 children = <Widget>[Text("Error has Occurred")];
               } else {
-                if (snapshot.hasData) {
-                  LCUWebSocketResponse response =
-                  LCUWebSocketResponse(snapshot.data! as String);
+                if (snapshot.hasData || connectionState == 1) {
+                  connectionState = 1;
+                  var response;
+                  try {
+                    response = LCUWebSocketResponse(snapshot.data! as String);
+                  } catch (e) {
+                    response = LCUWebSocketResponse("hello");
+                  }
 
                   switch (response.status) {
-                  // Home Screen
+                    // Home Screen
                     case 0:
                       {
                         children = <Widget>[
@@ -102,14 +109,15 @@ class _ClientHomeState extends State<ClientHome> {
                         ];
                       }
                       break;
-                  // Champion Select Screen
+                    // Champion Select Screen
                     case 1:
                       {
                         Session session = Session.fromJson(
                             json.decode(snapshot.data! as String)[2]['data']);
 
                         children = <Widget>[
-                          ChampionSelectHelper().champSelect(clientManager, session)
+                          ChampionSelectHelper()
+                              .champSelect(clientManager, session)
                         ];
                       }
                       break;
@@ -119,7 +127,6 @@ class _ClientHomeState extends State<ClientHome> {
                       }
                   }
                 } else {
-                  print(snapshot.data);
                   return Text("Error");
                 }
               }
@@ -132,24 +139,22 @@ class _ClientHomeState extends State<ClientHome> {
             }),
       );
     } else {
+      connectionState = 0;
       return Container();
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-    final prefs = Provider.of<LeagueClientProvider>(context, listen: false).preferences;
+    final prefs =
+        Provider.of<LeagueClientProvider>(context, listen: false).preferences;
     BorderRadiusGeometry radius = BorderRadius.only(
-      topLeft: Radius.circular(24.0),
-      topRight: Radius.circular(24.0)
-    );
+        topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0));
     //final channel = IOWebSocketChannel.connect(
     //   'wss://127.0.0.1:${clientManager.getPort()}',
     //  headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
     //channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
-    if(prefs!.getString('summonerName') != null)
-    {
+    if (prefs!.getString('summonerName') != null) {
       return Scaffold(
           drawer: Drawer(),
           appBar: AppBar(
@@ -178,9 +183,7 @@ class _ClientHomeState extends State<ClientHome> {
               TextButton(
                 onPressed: () {
                   prefs.remove('summonerName');
-                  setState(() {
-
-                  });
+                  setState(() {});
                 },
                 child: Text("Clear Prefs"),
               ),
@@ -204,11 +207,11 @@ class _ClientHomeState extends State<ClientHome> {
                 collapsed: barCollapsed(),
                 panel: home(context),
                 body: Center(
-                 child: Text("Test"),
-               ),
+                  child: Text("Test"),
+                ),
               ))
-        //home(clientManager, channel, context)),
-      );
+          //home(clientManager, channel, context)),
+          );
     } else {
       //first time setup
       return IntroductionScreen(
@@ -222,9 +225,8 @@ class _ClientHomeState extends State<ClientHome> {
               child: Center(
                 child: TextFormField(
                   decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Enter Summoner Name'
-                  ),
+                      border: UnderlineInputBorder(),
+                      labelText: 'Enter Summoner Name'),
                   controller: userNameController,
                 ),
               ),
@@ -243,9 +245,8 @@ class _ClientHomeState extends State<ClientHome> {
         done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
       );
     }
-    return Container();
-
   }
+
   @override
   void dispose() {
     super.dispose();

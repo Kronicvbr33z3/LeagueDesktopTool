@@ -24,6 +24,14 @@ class LeagueClientProvider with ChangeNotifier {
         await initWebSocket();
         _clientRunningCheck = true;
         notifyListeners();
+      } else {
+        // client is not running
+        // check to see if client was previously running
+        if(_clientManager != null)
+          {
+            await leagueChannel!.sink.close();
+            leagueChannel = null;
+          }
       }
     });
   }
@@ -35,9 +43,9 @@ class LeagueClientProvider with ChangeNotifier {
   String _leagueClientDir = "";
   bool _clientRunningCheck = false;
   IOWebSocketChannel? leagueChannel;
-  WebSocket? _ws;
   SharedPreferences? preferences;
-  Stream? clientStream;
+  Stream? leagueStream;
+
   // Construct and initalize client manager
   LeagueConnector? _connector;
   ClientManager? get clientManager => _clientManager!;
@@ -70,7 +78,7 @@ class LeagueClientProvider with ChangeNotifier {
 
     leagueChannel!.sink
         .add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
-    clientStream = leagueChannel!.stream.asBroadcastStream();
+    leagueStream = leagueChannel!.stream.asBroadcastStream();
   }
   Future<void>? initProcessWatcher(StreamController<bool>? stream) {
     Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -93,6 +101,14 @@ class LeagueClientProvider with ChangeNotifier {
       if (event.path.contains("lockfile") && event.type == ChangeType.ADD) {
         var file = File(event.path);
         await _connector?.constructFromLCUFile(file);
+        _clientManager?.connector = _connector!;
+        while (!await _clientManager!.checkClientConnection())
+        {
+          print("Client not ready trying again in 5 seconds");
+          await Future.delayed(Duration(seconds: 5));
+        }
+
+        await initWebSocket();
         stream.add(true);
         _clientRunningCheck = true;
         notifyListeners();
