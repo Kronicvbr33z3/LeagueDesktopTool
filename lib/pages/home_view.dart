@@ -8,9 +8,9 @@ class HomeView {
   Widget playerCard(Summoner summoner) {
     double boxHeight = 0;
     if (summoner.rank.ranks.length != 0) {
-      boxHeight = (summoner.rank.ranks.length * 250.0);
+      boxHeight = (summoner.rank.ranks.length * 220.0);
     } else {
-      boxHeight = 170;
+      boxHeight = 150;
     }
     return Stack(
       children: <Widget>[

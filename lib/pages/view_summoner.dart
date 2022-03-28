@@ -17,18 +17,14 @@ class _ViewSummonerState extends State<ViewSummoner> {
     await instance.setupSearchedSummoner();
     //Check to make sure Data is Valid
     if (instance.accountId == null ||
-        instance.summonerName == null ||
-        instance.matches == null ||
-        instance.rank == null) {
+        instance.summonerName == null) {
       throw StateError('Error');
     }
     return instance;
   }
 
   Widget _buildRow(Summoner data, int index) {
-    RouteArguments args = RouteArguments(data, index);
     Color getColor(int index) {
-      //print(data.matches.matches[index].participants.gameDuration / 60);
       if (data.matches[index].me.win) {
         return Color.fromRGBO(65, 111, 201, 1);
       } else {
@@ -167,46 +163,101 @@ class _ViewSummonerState extends State<ViewSummoner> {
     );
   }
 
-  Text getQueue(Summoner data, int i) {
-    switch (data.rank.ranks[i].queueType) {
-      case "RANKED_SOLO_5x5":
-        return Text('Solo/Duo',
-            style: TextStyle(
-                color: Colors.yellowAccent, fontWeight: FontWeight.bold));
-      case "RANKED_FLEX_SR":
-        return Text('Flex',
-            style: TextStyle(
-              color: Colors.yellowAccent,
-              fontWeight: FontWeight.bold,
-            ));
-      default:
-        return Text('Unknown Queue');
+  int getQueue(int soloOrFlex, Summoner data) {
+    if (data.rank.ranks.length == 0)
+      {
+        return -1;
+      }
+    if (soloOrFlex == 1) {
+
+        for (int i = 0; i <= data.rank.ranks.length - 1; i++) {
+            if (data.rank.ranks[i].queueType == "RANKED_SOLO_5x5") {
+              return i;
+            }
+          }
+        // No Solo Duo Rank
+        return -1;
+      } else {
+      for (int i = 0; i <= data.rank.ranks.length - 1; i++) {
+        if (data.rank.ranks[i].queueType == "RANKED_FLEX_SR") {
+          return i;
+        }
+      }
+      // No Flex Rank
+      return -1;
     }
   }
 
   Widget _buildRankInfo(Summoner data, int i) {
-    return Column(
-      children: <Widget>[
-        getQueue(data, i),
-        Text(data.rank.ranks[i].tier,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(data.rank.ranks[i].rank,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+
+    if (i == 0) {
+      var currentQueue = getQueue(1, data);
+      if (currentQueue == -1) {
+          return Text("Unranked");
+        }
+        // Solo Duo on Top
+        return Column(
           children: <Widget>[
-            Text(data.rank.ranks[i].lp.toString(),
+            Text('Solo/Duo',
+                style: TextStyle(
+                    color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+
+            Text(data.rank.ranks[currentQueue].tier,
                 style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(data.rank.ranks[currentQueue].rank,
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(data.rank.ranks[currentQueue].lp.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            )
           ],
-        )
-      ],
-    );
+        );
+      } else {
+      // Flex on Bottom
+      var currentQueue = getQueue(2, data);
+      if (currentQueue != -1) {
+        return Column(
+          children: <Widget>[
+            Text('Flex',
+                style: TextStyle(
+                    color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+            Text(data.rank.ranks[currentQueue].tier,
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(data.rank.ranks[currentQueue].rank,
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(data.rank.ranks[currentQueue].lp.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            )
+          ],
+        );
+      }
+      return Column(
+        children: <Widget>[
+          Text('Flex',
+              style: TextStyle(
+                  color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+          Text("Unranked",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+          SizedBox(height: 40,)
+            ],
+          );
+    }
+
   }
 
   Widget _buildRank(Summoner data) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Expanded(
           child: Container(
@@ -214,19 +265,38 @@ class _ViewSummonerState extends State<ViewSummoner> {
               borderRadius: BorderRadius.all(Radius.circular(8)),
               color: Color.fromRGBO(43, 38, 60, 1),
             ),
-            margin: EdgeInsets.fromLTRB(300, 0, 10, 0),
+            //margin: EdgeInsets.fromLTRB(0, 0, 700, 0),
             child: Column(
               children: <Widget>[
-                ListView.separated(
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey,
-                  ),
-                  itemCount: data.rank.ranks.length,
-                  shrinkWrap: true,
-                  addAutomaticKeepAlives: true,
-                  itemBuilder: (context, i) {
-                    return _buildRankInfo(data, i);
-                  },
+                Row(
+                  // Outer Top Row
+                  children: <Widget>[
+                    // Rank
+                    Expanded(
+                      child: Column (
+                        children: <Widget> [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 2, color: Colors.grey.shade600)
+                            ),
+                            child: ListView.separated(
+                              separatorBuilder: (context, index) => Divider(
+                                color: Colors.grey,
+                              ),
+                              itemCount: 2,
+                              shrinkWrap: true,
+                              addAutomaticKeepAlives: true,
+                              itemBuilder: (context, i) {
+                                return _buildRankInfo(data, i);
+                              },
+                            ),
+                          )
+                        ]
+                      ),
+                    ),
+
+                    SizedBox(width: 800),
+                  ],
                 ),
               ],
             ),

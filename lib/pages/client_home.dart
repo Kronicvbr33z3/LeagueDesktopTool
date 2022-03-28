@@ -67,8 +67,7 @@ class _ClientHomeState extends State<ClientHome> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24.0),
                 topRight: Radius.circular(24.0))),
-        margin: EdgeInsets.fromLTRB(24, 24, 24, 0),
-        child: Center(child: Text("Test header")));
+        child: Center(child: Text("Live Helper")));
   }
 
   Widget home(BuildContext context) {
@@ -82,7 +81,9 @@ class _ClientHomeState extends State<ClientHome> {
       return Container(
         decoration: BoxDecoration(
             color: Color.fromRGBO(28, 22, 46, 1),
-            borderRadius: BorderRadius.all(Radius.circular(24.0))),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24.0),
+                topRight: Radius.circular(24.0))),
         margin: EdgeInsets.all(24),
         child: StreamBuilder(
             stream: leagueChannel,
@@ -140,7 +141,13 @@ class _ClientHomeState extends State<ClientHome> {
       );
     } else {
       connectionState = 0;
-      return Container();
+      return Container(
+          decoration: BoxDecoration(
+              color: Colors.blueGrey,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24.0),
+                  topRight: Radius.circular(24.0))),
+          child: Center(child: Text("Client is not currently running!", style: TextStyle(fontWeight: FontWeight.bold)),));
     }
   }
 
@@ -178,15 +185,6 @@ class _ClientHomeState extends State<ClientHome> {
                   ),
                 )),
             actions: [
-              // Add status of league connection here via green/red circle
-              clientStatus(),
-              TextButton(
-                onPressed: () {
-                  prefs.remove('summonerName');
-                  setState(() {});
-                },
-                child: Text("Clear Prefs"),
-              ),
               TextButton(
                 onPressed: () {
                   _auth.signOut();
@@ -201,18 +199,21 @@ class _ClientHomeState extends State<ClientHome> {
               color: Color.fromRGBO(28, 22, 46, 1),
               child: SlidingUpPanel(
                 minHeight: 50.0,
+                maxHeight: 550,
                 backdropEnabled: true,
                 renderPanelSheet: false,
                 borderRadius: radius,
                 collapsed: barCollapsed(),
                 panel: home(context),
                 body: Center(
-                  child: Text("Test"),
+                  child: Text("Home Display Based on Referenced Summoner"),
                 ),
               ))
           //home(clientManager, channel, context)),
           );
     } else {
+
+
       //first time setup
       return IntroductionScreen(
         key: introKey,
