@@ -51,6 +51,7 @@ class LeagueClientProvider with ChangeNotifier {
   ClientManager? get clientManager => _clientManager!;
   Summoner get summoner => _summoner!;
   bool get clientRunningCheck => _clientRunningCheck;
+
   Future<bool> makeClientManager() async {
     if(_clientManager != null)
       {
@@ -130,6 +131,10 @@ class LeagueClientProvider with ChangeNotifier {
     _connector = LeagueConnector();
     void startCheck() async {
       //get preferences
+      // retrieve league install directory if it exists from shared preferences
+
+
+
       if (_leagueClientDir != "") {
         await initLockFileWatcher(_leagueClientDir, _clientRunningController!);
         return;

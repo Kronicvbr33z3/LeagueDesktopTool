@@ -38,6 +38,7 @@ class Summoner {
       summonerName = summoner['name'];
       summonerLevel = summoner['summonerLevel'];
       puuid = summoner['puuid'];
+      profileIconId = summoner['profileIconId'];
     } catch (e) {
       print('Unable to Load Summoner');
     }

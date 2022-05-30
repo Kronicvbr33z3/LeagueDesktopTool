@@ -36,7 +36,7 @@ class _ClientHomeState extends State<ClientHome> {
   @override
   void didChangeDependencies() {
     // check if client was running
-    clientRunning = Provider.of<LeagueClientProvider>(context, listen: false)
+    clientRunning = Provider.of<LeagueClientProvider>(context, listen: true)
         .clientRunningCheck;
     if (clientRunning) {
       connectionState = 1;
@@ -67,7 +67,7 @@ class _ClientHomeState extends State<ClientHome> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24.0),
                 topRight: Radius.circular(24.0))),
-        child: Center(child: Text("Live Helper")));
+        child: Center(child: Text("Live Helper", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),)));
   }
 
   Widget home(BuildContext context) {
@@ -157,10 +157,6 @@ class _ClientHomeState extends State<ClientHome> {
         Provider.of<LeagueClientProvider>(context, listen: false).preferences;
     BorderRadiusGeometry radius = BorderRadius.only(
         topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0));
-    //final channel = IOWebSocketChannel.connect(
-    //   'wss://127.0.0.1:${clientManager.getPort()}',
-    //  headers: {"Authorization": "Basic ${clientManager.getAuthHeader()}"});
-    //channel.sink.add('[5, "OnJsonApiEvent_lol-champ-select_v1_session"]');
     if (prefs!.getString('summonerName') != null) {
       return Scaffold(
           drawer: Drawer(),
@@ -187,6 +183,12 @@ class _ClientHomeState extends State<ClientHome> {
             actions: [
               TextButton(
                 onPressed: () {
+                  prefs.clear();
+                },
+                child: Text("Clear Prefs")
+              ),
+              TextButton(
+                onPressed: () {
                   _auth.signOut();
                   Navigator.pushReplacementNamed(context, '/home');
                 },
@@ -206,7 +208,7 @@ class _ClientHomeState extends State<ClientHome> {
                 collapsed: barCollapsed(),
                 panel: home(context),
                 body: Center(
-                  child: Text("Home Display Based on Referenced Summoner"),
+                  child: ViewSummoner.fromPlayer(prefs.getString('summonerName')),
                 ),
               ))
           //home(clientManager, channel, context)),
