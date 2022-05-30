@@ -9,12 +9,12 @@ final String apiKey = '$riotApiKey';
 
 class Summoner {
   static final String apiKey = '$riotApiKey';
-  String summonerName = "";
-  int accountId = 0;
-  int profileIconId = 0;
-  String puuid = "";
-  int summonerLevel = 0;
-  int lcuSummonerApi = 0;
+  String? summonerName = "";
+  int? accountId = 0;
+  int? profileIconId = 0;
+  String? puuid = "";
+  int? summonerLevel = 0;
+  int? lcuSummonerApi = 0;
   //MatchHistory matches;
   late Rank rank;
   late String summonerId;
@@ -38,6 +38,7 @@ class Summoner {
       summonerName = summoner['name'];
       summonerLevel = summoner['summonerLevel'];
       puuid = summoner['puuid'];
+      profileIconId = summoner['profileIconId'];
     } catch (e) {
       print('Unable to Load Summoner');
     }
@@ -78,7 +79,7 @@ class Summoner {
         matches.add(Match(match));
       }
       for (var match in matches) {
-        await match.getMatch(puuid);
+        await match.getMatch(puuid!);
       }
       //print(matchHistory);
     } catch (e) {

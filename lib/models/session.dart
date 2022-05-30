@@ -1,12 +1,12 @@
 class Session {
-  int gameId;
-  List<MyTeam> myTeam;
+  int? gameId;
+  List<MyTeam>? myTeam;
   Session.fromJson(Map<String, dynamic> json) {
     gameId = json['gameId'];
     final info = json['myTeam'];
     myTeam = [];
     for(var i = 0; i < info.length; i++) {
-      myTeam.add(MyTeam.fromJson(info[i]));
+      myTeam?.add(MyTeam.fromJson(info[i]));
     }
 
   }
@@ -15,16 +15,16 @@ class Session {
 }
 
 class MyTeam {
-  String assignedPosition;
-  int cellId;
-  int championId;
-  int championPickIntent;
-  int spell1Id;
-  int spell2Id;
-  int summonerId;
-  int team;
-  int wardSkinId;
-  String summonerName;
+  String? assignedPosition;
+  int? cellId;
+  int? championId;
+  int? championPickIntent;
+  int? spell1Id;
+  int? spell2Id;
+  int? summonerId;
+  int? team;
+  int? wardSkinId;
+  String? summonerName;
 
   MyTeam.fromJson(Map<String, dynamic> json) {
     assignedPosition = json['assignedPosition'];

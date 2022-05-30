@@ -1,14 +1,17 @@
 import 'package:dart_lol/lol_api/dart_lol.dart';
 import 'package:dart_lol/lol_api/summoner.dart';
 import 'package:flutter/material.dart';
+import 'package:kronic_desktop_tool/pages/home_view.dart';
 
 class ViewSummoner extends StatefulWidget {
   static const routeName = '/view_summoner';
+  String? summoner;
+  ViewSummoner();
+  ViewSummoner.fromPlayer(this.summoner);
   @override
   _ViewSummonerState createState() => _ViewSummonerState();
 }
 
-//TODO Make Rank Look Good
 class _ViewSummonerState extends State<ViewSummoner> {
   var version;
   Future<Summoner> setupSummoner(String value) async {
@@ -16,19 +19,14 @@ class _ViewSummonerState extends State<ViewSummoner> {
     Summoner instance = Summoner.fromName(value);
     await instance.setupSearchedSummoner();
     //Check to make sure Data is Valid
-    if (instance.accountId == null ||
-        instance.summonerName == null ||
-        instance.matches == null ||
-        instance.rank == null) {
+    if (instance.accountId == null || instance.summonerName == null) {
       throw StateError('Error');
     }
     return instance;
   }
 
   Widget _buildRow(Summoner data, int index) {
-    RouteArguments args = RouteArguments(data, index);
     Color getColor(int index) {
-      //print(data.matches.matches[index].participants.gameDuration / 60);
       if (data.matches[index].me.win) {
         return Color.fromRGBO(65, 111, 201, 1);
       } else {
@@ -167,73 +165,92 @@ class _ViewSummonerState extends State<ViewSummoner> {
     );
   }
 
-  Text getQueue(Summoner data, int i) {
-    switch (data.rank.ranks[i].queueType) {
-      case "RANKED_SOLO_5x5":
-        return Text('Solo/Duo',
-            style: TextStyle(
-                color: Colors.yellowAccent, fontWeight: FontWeight.bold));
-      case "RANKED_FLEX_SR":
-        return Text('Flex',
-            style: TextStyle(
-              color: Colors.yellowAccent,
-              fontWeight: FontWeight.bold,
-            ));
-      default:
-        return Text('Unknown Queue');
+  int getQueue(int soloOrFlex, Summoner data) {
+    if (data.rank.ranks.length == 0) {
+      return -1;
+    }
+    if (soloOrFlex == 1) {
+      for (int i = 0; i <= data.rank.ranks.length - 1; i++) {
+        if (data.rank.ranks[i].queueType == "RANKED_SOLO_5x5") {
+          return i;
+        }
+      }
+      // No Solo Duo Rank
+      return -1;
+    } else {
+      for (int i = 0; i <= data.rank.ranks.length - 1; i++) {
+        if (data.rank.ranks[i].queueType == "RANKED_FLEX_SR") {
+          return i;
+        }
+      }
+      // No Flex Rank
+      return -1;
     }
   }
 
   Widget _buildRankInfo(Summoner data, int i) {
-    return Column(
-      children: <Widget>[
-        getQueue(data, i),
-        Text(data.rank.ranks[i].tier,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(data.rank.ranks[i].rank,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    if (i == 0) {
+      var currentQueue = getQueue(1, data);
+      if (currentQueue == -1) {
+        return Text("Unranked");
+      }
+      // Solo Duo on Top
+      return Column(
+        children: <Widget>[
+          Text('Solo/Duo',
+              style: TextStyle(
+                  color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+          Text(data.rank.ranks[currentQueue].tier,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(data.rank.ranks[currentQueue].rank,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(data.rank.ranks[currentQueue].lp.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          )
+        ],
+      );
+    } else {
+      // Flex on Bottom
+      var currentQueue = getQueue(2, data);
+      if (currentQueue != -1) {
+        return Column(
           children: <Widget>[
-            Text(data.rank.ranks[i].lp.toString() ?? "Not Found",
+            Text('Flex',
+                style: TextStyle(
+                    color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+            Text(data.rank.ranks[currentQueue].tier,
                 style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget _buildRank(Summoner data) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: Color.fromRGBO(43, 38, 60, 1),
-            ),
-            margin: EdgeInsets.fromLTRB(300, 0, 10, 0),
-            child: Column(
+            Text(data.rank.ranks[currentQueue].rank,
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                ListView.separated(
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey,
-                  ),
-                  itemCount: data.rank.ranks.length,
-                  shrinkWrap: true,
-                  addAutomaticKeepAlives: true,
-                  itemBuilder: (context, i) {
-                    return _buildRankInfo(data, i);
-                  },
-                ),
+                Text(data.rank.ranks[currentQueue].lp.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('LP', style: TextStyle(fontWeight: FontWeight.bold)),
               ],
-            ),
-          ),
-        ),
-      ],
-    );
+            )
+          ],
+        );
+      }
+      return Column(
+        children: <Widget>[
+          Text('Flex',
+              style: TextStyle(
+                  color: Colors.yellowAccent, fontWeight: FontWeight.bold)),
+          Text("Unranked",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+          SizedBox(
+            height: 40,
+          )
+        ],
+      );
+    }
   }
 
   Widget _buildMatchHistory(Summoner data) {
@@ -248,34 +265,98 @@ class _ViewSummonerState extends State<ViewSummoner> {
         });
   }
 
+  Widget playerCard(Summoner summoner) {
+    double boxHeight = 0;
+    if (summoner.rank.ranks.length != 0) {
+      boxHeight = 150 + (summoner.rank.ranks.length * 80);
+    } else {
+      boxHeight = 150;
+    }
+    return Stack(
+      children: <Widget>[
+        Card(
+          margin: const EdgeInsets.only(top: 20.0),
+          child: SizedBox(
+              height: boxHeight,
+              width: 300,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 45.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      summoner.summonerName!,
+                      style: TextStyle(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text("Level: " + summoner.summonerLevel.toString()),
+                    ListView.separated(
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.yellow,
+                      ),
+                      itemCount: summoner.rank.ranks.length,
+                      addAutomaticKeepAlives: true,
+                      shrinkWrap: true,
+                      itemBuilder: (context, i) {
+                        if (summoner.rank.ranks[i].tier == null) {
+                          return Container();
+                        }
+                        return _buildRankInfo(summoner, i);
+                      },
+                    ),
+                  ],
+                ),
+              )),
+        ),
+        Positioned(
+          top: .0,
+          left: .0,
+          right: .0,
+          child: Center(
+            child: FutureBuilder<NetworkImage>(
+                future: summonerIcon(summoner.profileIconId!),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return CircleAvatar(
+                      radius: 30,
+                      foregroundImage: snapshot.data,
+                    );
+                  }
+                  return CircleAvatar();
+                }),
+          ),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    String data = ModalRoute.of(context).settings.arguments;
+    String? data;
+    if (widget.summoner == null) {
+      data = ModalRoute.of(context)?.settings.arguments as String?;
+    } else {
+      data = widget.summoner;
+    }
 
     return FutureBuilder<Summoner>(
-        future: setupSummoner(data),
+        future: setupSummoner(data!),
         builder: (BuildContext context, AsyncSnapshot<Summoner> snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
-              backgroundColor: Color.fromRGBO(28, 22, 46, 1),
               appBar: AppBar(
-                title: Text(snapshot.data.summonerName,
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                elevation: 0.0,
-                backgroundColor: Color.fromRGBO(28, 22, 46, 1),
-              ),
-              body: Column(
+                  elevation: 0, backgroundColor: Color.fromRGBO(28, 22, 46, 1)),
+              backgroundColor: Color.fromRGBO(28, 22, 46, 1),
+              body: Row(
                 children: <Widget>[
-                  Divider(
-                    color: Color.fromRGBO(43, 38, 60, 1),
-                    thickness: 2,
-                  ),
-                  _buildRank(snapshot.data),
+                  playerCard(snapshot.data!),
                   Expanded(
                     child: Container(
                       width: 500,
                       padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                      child: _buildMatchHistory(snapshot.data),
+                      child: _buildMatchHistory(snapshot.data!),
                     ),
                   ),
                   //Divider(color: Color.fromRGBO(43, 38, 60, 1), thickness: 2,),
