@@ -108,24 +108,6 @@ class ClientManager {
         file['summonerId']);
   }
 
-  Future<RuneData> getRunes(int champId, [int? id]) async {
-    var file = await rootBundle.loadString('python/champions/$champId.json');
-    var values = jsonDecode(file);
-
-    return RuneData(
-        values['perk0'],
-        values['perk1'],
-        values['perk2'],
-        values['perk3'],
-        values['perk4'],
-        values['perk5'],
-        values['statPerk0'],
-        values['statPerk1'],
-        values['statPerk2'],
-        values['primaryStyleId'],
-        values['subStyleId']);
-  }
-
   Future<void> putRunes(RuneData rd) async {
     var runeId = await _getRuneId();
     await deleteRequest('/lol-perks/v1/pages/$runeId');
@@ -154,7 +136,7 @@ class ClientManager {
             rd.statPerk1,
             rd.statPerk2
           ],
-          "subStyleId": rd.subStyleId
+          "subStyleId": rd.secondaryStyleId
         }));
   }
 
@@ -167,18 +149,18 @@ class ClientManager {
   String getPort() {
     return connector.port;
   }
-  Future<bool> checkClientConnection() async{
+
+  Future<bool> checkClientConnection() async {
     var url = "${connector.url}/lol-summoner/v1/current-summoner";
     try {
       var response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200){
+      if (response.statusCode == 200) {
         return true;
       }
     } catch (e) {
       return false;
     }
     return false;
-
   }
 }
 
@@ -193,7 +175,7 @@ class RuneData {
   int statPerk1;
   int statPerk2;
   int primaryStyleId;
-  int subStyleId;
+  int secondaryStyleId;
   RuneData(
       this.perk0,
       this.perk1,
@@ -205,7 +187,7 @@ class RuneData {
       this.statPerk1,
       this.statPerk2,
       this.primaryStyleId,
-      this.subStyleId);
+      this.secondaryStyleId);
 
   static RuneData fromJson(decode) {
     return RuneData(
@@ -219,6 +201,6 @@ class RuneData {
         decode['statPerk1'],
         decode['statPerk2'],
         decode['primaryStyleId'],
-        decode['subStyleId']);
+        decode['secondaryStyleId']);
   }
 }
