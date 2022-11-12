@@ -20,6 +20,9 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
+dependency_overrides:
+  firebase_core_platform_interface: 4.5.1
+
 dependencies:
   flutter:
     sdk: flutter
@@ -42,16 +45,24 @@ dependencies:
   watcher: ^1.0.1
   cloud_firestore: ^3.1.8
   firebase_auth: ^3.3.7
-  firebase_auth_desktop: ^0.1.1-dev.0
-  google_fonts: ^2.3.1
+  firebase_core_platform_interface: ^4.5.2
+  firebase_auth_desktop: ^1.0.2
+  google_fonts: ^3.0.1
   firebase_core: ^1.9.0
-  firebase_core_desktop: ^0.1.1-dev.0
+  firebase_core_desktop: ^1.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  msix: ^2.8.0
-
+  msix: ^3.6.0
+msix_config:
+  display_name: Kronic Desktop Tool
+  publisher_display_name: Rain Entertainment LLC.
+  publisher: CN=32FD1DF6-A35A-4D25-9F60-CCAEF8696C9C
+  identity_name: 17660RainEntertainmentLLC.KronicDesktopTool
+  msix_version: 1.0.1.0
+  logo_path: J:\Development\Projects\KronicDesktopTool\windows\runner\resources\app_icon.ico
+  capabilities: internetClient
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

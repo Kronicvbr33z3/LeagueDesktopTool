@@ -9,7 +9,7 @@ class KronicServer {
 
   static Future<RuneData> getRunes(int champId) async {
     Response response = await get(Uri.parse(
-        "http://kronicdesktoptool.tplinkdns.com/runes?champId=$champId"));
+        "http://kronicdesktoptool.tplinkdns.com/api/runes?champId=$champId"));
     if (response.statusCode == 200) {
       return RuneData.fromJson(json.decode(response.body));
     } else {

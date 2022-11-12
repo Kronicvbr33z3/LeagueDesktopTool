@@ -45,8 +45,7 @@ class _MyAppState extends State<MyApp> {
   String _windowSize = 'Unknown';
 
   void initWindow() async {
-    await DesktopWindow.setMinWindowSize(Size(1280, 720));
-    await DesktopWindow.setMaxWindowSize(Size(1280, 720));
+    await DesktopWindow.setMinWindowSize(Size(700, 480));
   }
 
   @override
