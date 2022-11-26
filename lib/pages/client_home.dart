@@ -113,6 +113,7 @@ class _ClientHomeState extends State<ClientHome> {
                     // Champion Select Screen
                     case 1:
                       {
+                        print(snapshot.data! as String);
                         Session session = Session.fromJson(
                             json.decode(snapshot.data! as String)[2]['data']);
 

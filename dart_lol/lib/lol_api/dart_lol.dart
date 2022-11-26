@@ -31,3 +31,12 @@ Future<CircleAvatar> getChampionIcon(String championName) async {
     backgroundColor: Colors.transparent,
   );
 }
+  Future<String> getChampionNameFromId(int id) async {
+    var patch = await getLatestPatch();
+    var response = await http.get(Uri.parse(
+        "http://ddragon.leagueoflegends.com/cdn/$patch/data/en_US/champion.json"));
+    var json = jsonDecode(response.body);
+    var champ = json["data"].keys.firstWhere((key) => json["data"][key]["key"] == id.toString());
+    return champ;
+
+}

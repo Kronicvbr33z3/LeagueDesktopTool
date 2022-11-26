@@ -6,6 +6,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:dart_lol/lcu/league_client_connector.dart';
 
+import '../lol_api/dart_lol.dart';
+
 class ClientManager {
   LeagueConnector connector;
   ClientManager(this.connector);
@@ -108,8 +110,9 @@ class ClientManager {
         file['summonerId']);
   }
 
-  Future<void> putRunes(RuneData rd) async {
+  Future<void> putRunes(RuneData rd, int champId) async {
     var runeId = await _getRuneId();
+    var champion = await getChampionNameFromId(champId);
     await deleteRequest('/lol-perks/v1/pages/$runeId');
     postRequest(
         '/lol-perks/v1/pages',
@@ -122,7 +125,7 @@ class ClientManager {
           "isEditable": true,
           "isValid": true,
           "lastModified": 0,
-          "name": "Kronic Desktop Tool",
+          "name": "KDT[$champion]",
           "order": 0,
           "primaryStyleId": rd.primaryStyleId,
           "selectedPerkIds": [

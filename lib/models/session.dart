@@ -25,6 +25,7 @@ class MyTeam {
   int? team;
   int? wardSkinId;
   String? summonerName;
+  String? nameVisibilityType;
 
   MyTeam.fromJson(Map<String, dynamic> json) {
     assignedPosition = json['assignedPosition'];
@@ -36,5 +37,6 @@ class MyTeam {
     summonerId = json['summonerId'];
     team = json['team'];
     wardSkinId = json['wardSkinId'];
+    nameVisibilityType = json['nameVisibilityType'];
   }
 }

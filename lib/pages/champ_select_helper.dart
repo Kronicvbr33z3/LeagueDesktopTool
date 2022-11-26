@@ -40,7 +40,7 @@ class ChampionSelectHelper {
                     print("Choose Champion");
                   } else {
                     var runes = await KronicServer.getRunes(champId);
-                    await cl.putRunes(runes);
+                    await cl.putRunes(runes, champId);
                   }
                 } else {
                   print("Not In Champ Select");
@@ -72,13 +72,22 @@ class ChampionSelectHelper {
     // var body = json.decode(request);
     // var f = Session.fromJson(body);
     List<String> names = [];
-    for (var teamMember in session.myTeam!) {
-      var response = await cl
-          .getRequest("/lol-summoner/v1/summoners/${teamMember.summonerId}");
-      //  await Future.delayed(Duration(seconds: 3));
+    if(session.myTeam != null) {
+      for (var teamMember in session.myTeam!) {
+        if(teamMember.nameVisibilityType != null && teamMember.nameVisibilityType! != "HIDDEN") {
+          var response = await cl
+              .getRequest("/lol-summoner/v1/summoners/${teamMember.summonerId}");
+          //  await Future.delayed(Duration(seconds: 3));
+          // make sure the response isn't null
 
-      names.add(json.decode(response)['displayName']);
+          names.add(json.decode(response)['displayName']);
+        } else {
+          names.add("Hidden");
+        }
+
+      }
     }
+
     //print(names.length);
     return names;
   }

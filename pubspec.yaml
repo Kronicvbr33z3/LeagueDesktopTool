@@ -60,7 +60,7 @@ msix_config:
   publisher_display_name: Rain Entertainment LLC.
   publisher: CN=32FD1DF6-A35A-4D25-9F60-CCAEF8696C9C
   identity_name: 17660RainEntertainmentLLC.KronicDesktopTool
-  msix_version: 1.0.1.0
+  msix_version: 1.0.2.0
   logo_path: J:\Development\Projects\KronicDesktopTool\windows\runner\resources\app_icon.ico
   capabilities: internetClient
 # For information on the generic Dart part of this file, see the
