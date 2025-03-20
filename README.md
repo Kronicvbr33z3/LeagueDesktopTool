@@ -17,7 +17,6 @@ Login page/Registration Page
 Updated UI
 Search bar for looking up players. Includes Rank and Match History.
 Updated to use provider as a state manager.
-Server for runes is now a seprate project, http://kronicdesktoptool.tplinkdns.com/api/v1/runes?id=1 is an example link.
 
 # General project information
 
